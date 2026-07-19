@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DelishDish - Delivery Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@400;500;700&family=Satisfy&display=swap" rel="stylesheet">
+    <style>
+      /* Add similar basic styles as admin/index if desired */
+      body { font-family: 'Roboto', sans-serif; background-color: #f7fafc;}
+      h1, h2, h3 { font-family: 'Satisfy', cursive; }
+       .order-card { background-color: white; border: 1px solid #e2e8f0; margin-bottom: 1rem; padding: 1rem; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); }
+       .btn { padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: bold; transition: background-color 0.2s ease; cursor: pointer; }
+       .btn-accept { background-color: #48bb78; color: white; } .btn-accept:hover { background-color: #38a169; }
+       .btn-update { background-color: #4299e1; color: white; } .btn-update:hover { background-color: #3182ce; }
+       .btn-logout { background-color: #a0aec0; color: white; } .btn-logout:hover { background-color: #718096; }
+    </style>
+</head>
+<body class="p-4">
+
+    <div id="loginView" class="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow-md">
+        <h1 class="text-3xl text-center text-orange-600 mb-6">Delivery Partner Login</h1>
+        <form id="loginForm">
+            <div class="mb-4">
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" id="email" required class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-orange-500 focus:border-orange-500">
+            </div>
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input type="password" id="password" required class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-orange-500 focus:border-orange-500">
+            </div>
+            <button type="submit" class="w-full bg-orange-500 text-white font-bold py-2 px-4 rounded hover:bg-orange-600 transition">Login</button>
+            <p id="loginStatus" class="text-center text-red-600 mt-4"></p>
+        </form>
+    </div>
+
+    <div id="dashboardView" class="hidden container mx-auto">
+        <div class="flex justify-between items-center mb-6">
+             <h1 class="text-4xl text-orange-600">Delivery Dashboard</h1>
+             <button id="logoutBtn" class="btn btn-logout">Logout</button>
+        </div>
+
+        <section class="mb-8">
+            <h2 class="text-3xl text-gray-700 mb-4">Available Orders</h2>
+            <div id="availableOrdersLoading" class="text-gray-500">Loading available orders...</div>
+            <div id="availableOrdersList"></div>
+            <p id="availableOrdersStatus" class="text-gray-500 hidden"></p>
+        </section>
+
+        <section>
+            <h2 class="text-3xl text-gray-700 mb-4">My Deliveries</h2>
+            <div id="myOrdersLoading" class="text-gray-500">Loading your deliveries...</div>
+            <div id="myOrdersList"></div>
+            <p id="myOrdersStatus" class="text-gray-500 hidden"></p>
+        </section>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const backendBaseUrl = 'http://localhost:3000';
+        const loginView = document.getElementById('loginView');
+        const dashboardView = document.getElementById('dashboardView');
+        const loginForm = document.getElementById('loginForm');
+        const loginStatus = document.getElementById('loginStatus');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        const availableOrdersLoading = document.getElementById('availableOrdersLoading');
+        const availableOrdersList = document.getElementById('availableOrdersList');
+        const availableOrdersStatus = document.getElementById('availableOrdersStatus');
+
+        const myOrdersLoading = document.getElementById('myOrdersLoading');
+        const myOrdersList = document.getElementById('myOrdersList');
+        const myOrdersStatus = document.getElementById('myOrdersStatus');
+
+        // --- Check login status on load ---
+        const token = localStorage.getItem('deliveryToken');
+        const role = localStorage.getItem('deliveryRole');
+        if (token && role === 'delivery') {
+            showDashboard();
+        } else {
+            showLogin();
+        }
+
+        // --- Login Logic ---
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginStatus.textContent = '';
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(`${backendBaseUrl}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+
+                if (response.ok && data.role === 'delivery') {
+                    localStorage.setItem('deliveryToken', data.token);
+                    localStorage.setItem('deliveryRole', data.role);
+                    showDashboard();
+                } else if (response.ok && data.role !== 'delivery') {
+                    loginStatus.textContent = 'Access denied. Not a delivery account.';
+                } else {
+                    loginStatus.textContent = data.message || 'Invalid email or password.';
+                }
+            } catch (error) {
+                console.error("Login error:", error);
+                loginStatus.textContent = 'Login failed. Check connection.';
+            }
+        });
+
+        // --- Logout Logic ---
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('deliveryToken');
+            localStorage.removeItem('deliveryRole');
+            showLogin();
+        });
+
+        // --- UI Switching ---
+        function showLogin() {
+            loginView.classList.remove('hidden');
+            dashboardView.classList.add('hidden');
+        }
+
+        function showDashboard() {
+            loginView.classList.add('hidden');
+            dashboardView.classList.remove('hidden');
+            fetchAvailableOrders();
+            fetchMyOrders();
+        }
+
+        // --- Fetch Available Orders ---
+        async function fetchAvailableOrders() {
+            availableOrdersLoading.classList.remove('hidden');
+            availableOrdersList.innerHTML = '';
+            availableOrdersStatus.classList.add('hidden');
+            const currentToken = localStorage.getItem('deliveryToken');
+
+            try {
+                const response = await fetch(`${backendBaseUrl}/api/delivery/orders/available`, {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                availableOrdersLoading.classList.add('hidden');
+
+                if (response.ok) {
+                    const orders = await response.json();
+                    if (orders.length > 0) {
+                        renderAvailableOrders(orders);
+                    } else {
+                        availableOrdersStatus.textContent = 'No orders currently available for pickup.';
+                        availableOrdersStatus.classList.remove('hidden');
+                    }
+                } else if (response.status === 401 || response.status === 403){
+                     logoutBtn.click(); // Force logout if token invalid/expired
+                } else {
+                    availableOrdersStatus.textContent = 'Failed to load available orders.';
+                    availableOrdersStatus.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Fetch available orders error:", error);
+                availableOrdersLoading.classList.add('hidden');
+                availableOrdersStatus.textContent = 'Network error fetching available orders.';
+                availableOrdersStatus.classList.remove('hidden');
+            }
+        }
+
+         // --- Render Available Orders ---
+        function renderAvailableOrders(orders) {
+            availableOrdersList.innerHTML = orders.map(order => `
+                <div class="order-card">
+                    <p><strong>Order #${order.orderId}</strong> (${new Date(order.orderDate).toLocaleTimeString()})</p>
+                    <p>Address: ${order.deliveryAddress}</p>
+                    <p>Items: ${order.cartItems.map(item => `${item.quantity}x ${item.name || 'Item'}`).join(', ')}</p>
+                    <p>Payment: ${order.paymentMethod} (Total: ₹${order.totalPrice.toFixed(2)})</p>
+                    <button class="btn btn-accept mt-2" data-order-id="${order.orderId}">Accept Order</button>
+                </div>
+            `).join('');
+        }
+
+        // --- Fetch My Orders ---
+        async function fetchMyOrders() {
+            myOrdersLoading.classList.remove('hidden');
+            myOrdersList.innerHTML = '';
+            myOrdersStatus.classList.add('hidden');
+            const currentToken = localStorage.getItem('deliveryToken');
+
+             try {
+                const response = await fetch(`${backendBaseUrl}/api/delivery/orders/my`, {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                myOrdersLoading.classList.add('hidden');
+
+                if (response.ok) {
+                    const orders = await response.json();
+                    if (orders.length > 0) {
+                        renderMyOrders(orders);
+                    } else {
+                        myOrdersStatus.textContent = 'You have no active deliveries.';
+                        myOrdersStatus.classList.remove('hidden');
+                    }
+                } else if (response.status === 401 || response.status === 403){
+                     logoutBtn.click(); // Force logout if token invalid/expired
+                } else {
+                    myOrdersStatus.textContent = 'Failed to load your deliveries.';
+                    myOrdersStatus.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Fetch my orders error:", error);
+                myOrdersLoading.classList.add('hidden');
+                myOrdersStatus.textContent = 'Network error fetching your deliveries.';
+                myOrdersStatus.classList.remove('hidden');
+            }
+        }
+
+         // --- Render My Orders ---
+        function renderMyOrders(orders) {
+            myOrdersList.innerHTML = orders.map(order => `
+                <div class="order-card">
+                    <p><strong>Order #${order.orderId}</strong> - Status: <strong>${order.status}</strong></p>
+                    <p>Customer: ${order.customerName} (${order.customerPhone})</p>
+                    <p>Address: ${order.deliveryAddress}</p>
+                    <p>Items: ${order.cartItems.map(item => `${item.quantity}x ${item.name || 'Item'}`).join(', ')}</p>
+                    <p>Payment: ${order.paymentMethod} (Total: ₹${order.totalPrice.toFixed(2)})</p>
+                    <div class="mt-2 space-x-2">
+                        ${order.status === 'Accepted' ? '<button class="btn btn-update" data-order-id="' + order.orderId + '" data-status="Out for Delivery">Mark Out for Delivery</button>' : ''}
+                        ${order.status === 'Out for Delivery' ? '<button class="btn btn-update" data-order-id="' + order.orderId + '" data-status="Delivered">Mark Delivered</button>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- Event Listener for Accept/Update Buttons ---
+        document.body.addEventListener('click', async (e) => {
+            const token = localStorage.getItem('deliveryToken');
+
+            // Handle Accept Click
+            if (e.target.classList.contains('btn-accept')) {
+                const orderId = e.target.dataset.orderId;
+                e.target.disabled = true; // Prevent double clicks
+                e.target.textContent = 'Accepting...';
+                try {
+                    const response = await fetch(`${backendBaseUrl}/api/delivery/orders/${orderId}/accept`, {
+                        method: 'PUT',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        alert('Order accepted!');
+                        fetchAvailableOrders(); // Refresh available list
+                        fetchMyOrders(); // Refresh my list
+                    } else {
+                         const data = await response.json();
+                         alert(`Failed to accept order: ${data.message}`);
+                         e.target.disabled = false;
+                         e.target.textContent = 'Accept Order';
+                    }
+                } catch (err) {
+                     alert('Network error accepting order.');
+                     e.target.disabled = false;
+                     e.target.textContent = 'Accept Order';
+                }
+            }
+
+            // Handle Status Update Click
+            if (e.target.classList.contains('btn-update')) {
+                 const orderId = e.target.dataset.orderId;
+                 const newStatus = e.target.dataset.status;
+                 e.target.disabled = true;
+                 e.target.textContent = 'Updating...';
+
+                 try {
+                     const response = await fetch(`${backendBaseUrl}/api/delivery/orders/${orderId}/status`, {
+                         method: 'PUT',
+                         headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                         },
+                         body: JSON.stringify({ status: newStatus })
+                     });
+                     if (response.ok) {
+                         alert(`Order status updated to ${newStatus}!`);
+                         fetchMyOrders(); // Refresh my list
+                     } else {
+                          const data = await response.json();
+                          alert(`Failed to update status: ${data.message}`);
+                          e.target.disabled = false;
+                           // Restore original button text (logic could be improved)
+                           e.target.textContent = `Mark ${newStatus}`;
+                     }
+                 } catch (err) {
+                      alert('Network error updating status.');
+                      e.target.disabled = false;
+                      e.target.textContent = `Mark ${newStatus}`;
+                 }
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>

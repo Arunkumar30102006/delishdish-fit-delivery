@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DelishDish - Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@400;500;700&family=Satisfy&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-image: url('https://uniquedestination.mitsishotels.com/wp-content/uploads/2018/03/shutterstock_467823860.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: center;
+      color: #4b5563;
+    }
+    h1, h2, h3 { font-family: 'Satisfy', cursive; }
+    .btn-primary {
+      background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+      transition: left 0.5s;
+    }
+    .btn-primary:hover::before { left: 100%; }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .animate-fade-in { animation: fadeInUp 0.6s ease-out forwards; }
+    .animate-slide-in { animation: slideInLeft 0.5s ease-out forwards; }
+    .animate-scale-in { animation: scaleIn 0.4s ease-out forwards; }
+
+    /* --- Enhanced Form Styles --- */
+    .form-section-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(255,247,237,0.92) 100%);
+      border: 1px solid rgba(245, 158, 11, 0.15);
+      border-radius: 1.25rem;
+      padding: 2rem;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(245, 158, 11, 0.05);
+      transition: all 0.3s ease;
+    }
+    .form-section-card:hover {
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(245, 158, 11, 0.15);
+      transform: translateY(-2px);
+    }
+    .form-group {
+      position: relative;
+    }
+    .form-group label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #374151;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.4rem;
+      font-family: 'Roboto', sans-serif;
+    }
+    .form-group label .label-icon {
+      width: 1rem;
+      height: 1rem;
+      color: #f59e0b;
+      flex-shrink: 0;
+    }
+    .enhanced-input,
+    .enhanced-select,
+    .enhanced-textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 0.75rem;
+      font-size: 0.95rem;
+      color: #1f2937;
+      background: rgba(255, 255, 255, 0.8);
+      transition: all 0.3s ease;
+      font-family: 'Roboto', sans-serif;
+      outline: none;
+    }
+    .enhanced-input:focus,
+    .enhanced-select:focus,
+    .enhanced-textarea:focus {
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15), 0 4px 12px rgba(0,0,0,0.05);
+      background: white;
+    }
+    .enhanced-input::placeholder,
+    .enhanced-textarea::placeholder {
+      color: #9ca3af;
+    }
+    .section-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 1rem;
+      background: linear-gradient(135deg, #fff7ed, #fef3c7);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 2rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #92400e;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-family: 'Roboto', sans-serif;
+      margin-bottom: 1rem;
+    }
+    .section-badge .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #f59e0b;
+      animation: pulse 2s infinite;
+    }
+    .image-preview-box {
+      width: 100%;
+      height: 120px;
+      border: 2px dashed #d1d5db;
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: rgba(249,250,251,0.7);
+      transition: all 0.3s ease;
+      margin-top: 0.5rem;
+    }
+    .image-preview-box:hover { border-color: #f59e0b; }
+    .image-preview-box img {
+      max-width: 100%; max-height: 100%;
+      object-fit: contain;
+      border-radius: 0.5rem;
+    }
+    .image-preview-box .placeholder-text {
+      color: #9ca3af;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+    .nutrition-bar-container {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .nutrition-mini-card {
+      flex: 1;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(249,250,251,0.9));
+      border: 1px solid #e5e7eb;
+      border-radius: 0.75rem;
+      padding: 0.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .nutrition-mini-card:hover {
+      border-color: var(--nut-color, #f59e0b);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .nutrition-mini-card .nut-icon { font-size: 1rem; margin-bottom: 0.15rem; }
+    .nutrition-mini-card .nut-value { font-size: 1.1rem; font-weight: 700; color: #1f2937; }
+    .nutrition-mini-card .nut-label { font-size: 0.65rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* --- Menu Item Cards --- */
+    .menu-item-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,247,237,0.92));
+      border: 1px solid rgba(245, 158, 11, 0.1);
+      border-radius: 1rem;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .menu-item-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+    .menu-item-card .card-img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+      background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .menu-item-card .card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .menu-item-card:hover .card-img img {
+      transform: scale(1.08);
+    }
+    .menu-item-card .card-img .no-img {
+      color: #d1d5db;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+      font-family: 'Roboto', sans-serif;
+    }
+    .menu-item-card .card-body {
+      padding: 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .menu-item-card .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1f2937;
+      font-family: 'Roboto', sans-serif;
+      margin-bottom: 0.25rem;
+      line-height: 1.3;
+    }
+    .menu-item-card .card-price {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #f59e0b;
+      font-family: 'Roboto', sans-serif;
+    }
+    .category-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: 2rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-family: 'Roboto', sans-serif;
+    }
+    .category-badge.standard { background: #dbeafe; color: #1e40af; }
+    .category-badge.weight-loss { background: #d1fae5; color: #065f46; }
+    .category-badge.weight-gain { background: #fce7f3; color: #9d174d; }
+    .category-badge.balanced { background: #fef3c7; color: #92400e; }
+    .category-badge.other { background: #f3f4f6; color: #4b5563; }
+    .nutrition-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      padding: 0.15rem 0.5rem;
+      background: rgba(249, 250, 251, 0.9);
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: #6b7280;
+      font-family: 'Roboto', sans-serif;
+    }
+    .menu-card-actions {
+      display: flex;
+      gap: 0.5rem;
+      padding-top: 0.75rem;
+      margin-top: auto;
+      border-top: 1px solid rgba(229, 231, 235, 0.5);
+    }
+    .menu-card-actions button {
+      flex: 1;
+      padding: 0.45rem 0;
+      border-radius: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      font-family: 'Roboto', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      border: none;
+    }
+    .menu-card-actions .edit-btn {
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      color: #1d4ed8;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+    .menu-card-actions .edit-btn:hover {
+      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(59, 130, 246, 0.15);
+    }
+    .menu-card-actions .delete-btn {
+      background: linear-gradient(135deg, #fef2f2, #fee2e2);
+      color: #dc2626;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+    .menu-card-actions .delete-btn:hover {
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(239, 68, 68, 0.15);
+    }
+    .search-input-wrapper {
+      position: relative;
+    }
+    .search-input-wrapper .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1.1rem;
+      height: 1.1rem;
+      color: #9ca3af;
+      pointer-events: none;
+    }
+    .search-input-wrapper input {
+      padding-left: 2.75rem;
+    }
+    .filter-pill {
+      padding: 0.35rem 0.9rem;
+      border-radius: 2rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: 'Roboto', sans-serif;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border: 1.5px solid #e5e7eb;
+      background: rgba(255,255,255,0.8);
+      color: #6b7280;
+    }
+    .filter-pill:hover {
+      border-color: #f59e0b;
+      color: #92400e;
+    }
+    .filter-pill.active {
+      background: linear-gradient(135deg, #fff7ed, #fef3c7);
+      border-color: #f59e0b;
+      color: #92400e;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+    }
+
+    /* --- Partner Cards --- */
+    .partner-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,247,237,0.9));
+      border: 1px solid rgba(245, 158, 11, 0.12);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .partner-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px; height: 100%;
+      background: linear-gradient(180deg, #f59e0b, #ef4444);
+      border-radius: 4px 0 0 4px;
+    }
+    .partner-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+    .partner-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: white;
+      flex-shrink: 0;
+    }
+    .add-partner-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(236,253,245,0.9));
+      border: 1px solid rgba(16, 185, 129, 0.15);
+      border-radius: 1.25rem;
+      padding: 2rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+    }
+
+    /* --- Modal Enhanced --- */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(255,247,237,0.97) 100%);
+      padding: 2.5rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(245, 158, 11, 0.1);
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      animation: scaleIn 0.3s ease-out;
+    }
+    .close-button {
+      color: #9ca3af;
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+      font-size: 2rem;
+      font-weight: bold;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+    .close-button:hover {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+      cursor: pointer;
+    }
+
+    /* --- Toast Notification --- */
+    .toast-notification {
+      position: fixed;
+      top: 5rem;
+      right: 1.5rem;
+      z-index: 2000;
+      padding: 1rem 1.5rem;
+      border-radius: 0.75rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      animation: slideInRight 0.4s ease-out;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      max-width: 400px;
+    }
+    .toast-notification.success {
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+      color: #065f46;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .toast-notification.error {
+      background: linear-gradient(135deg, #fef2f2, #fee2e2);
+      color: #991b1b;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(50px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Password reveal card */
+    .password-reveal-card {
+      background: linear-gradient(135deg, #fef9c3, #fef3c7);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 0.75rem;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      animation: fadeInUp 0.4s ease-out;
+    }
+    .password-reveal-card .pw-icon {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Custom scrollbar for modal */
+    .modal-content::-webkit-scrollbar { width: 6px; }
+    .modal-content::-webkit-scrollbar-track { background: transparent; }
+    .modal-content::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+    .modal-content::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+  </style>
+</head>
+<body class="bg-gray-100">
+
+  <nav class="bg-white p-4 shadow-md sticky top-0 z-50 rounded-b-xl">
+    <div class="container mx-auto flex justify-between items-center">
+      <a href="index.html" class="text-4xl font-extrabold text-orange-500 rounded-lg p-2 hover:bg-orange-50 transition">DelishDish</a>
+      <button id="logoutBtn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-full hover:bg-gray-700 transition shadow-md">Logout</button>
+    </div>
+  </nav>
+
+  <main class="container mx-auto py-8 px-4">
+
+    <section class="bg-white/70 p-8 rounded-3xl shadow-xl backdrop-blur-lg">
+      <h1 class="text-5xl font-extrabold text-center text-orange-600 mb-8">Admin Dashboard - Orders</h1>
+      <div id="loadingMessage" class="text-center text-gray-500 text-lg">Loading orders...</div>
+      <div id="ordersContainer" class="overflow-x-auto hidden">
+        <table class="min-w-full bg-white rounded-lg shadow-md">
+          <thead>
+            <tr class="bg-gray-200 text-gray-700 uppercase text-sm leading-normal">
+              <th class="py-3 px-6 text-left">Order ID</th>
+              <th class="py-3 px-6 text-left">Customer</th>
+              <th class="py-3 px-6 text-left">Items</th>
+              <th class="py-3 px-6 text-left">Date/Time</th>
+              <th class="py-3 px-6 text-left">Total</th>
+              <th class="py-3 px-6 text-left">Status</th>
+              <th class="py-3 px-6 text-left">Address</th>
+              <th class="py-3 px-6 text-left">Phone</th>
+              <th class="py-3 px-6 text-left">Payment</th>
+              <th class="py-3 px-6 text-left">Partner</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody" class="text-gray-600 text-sm font-light"></tbody>
+        </table>
+      </div>
+      <div id="statusMessage" class="text-center text-gray-500 text-lg hidden"></div>
+    </section>
+
+    <section class="bg-white/70 p-8 rounded-3xl shadow-xl backdrop-blur-lg mt-8 animate-fade-in">
+      <!-- Section Header -->
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center gap-2 mb-3">
+          <span class="section-badge"><span class="badge-dot"></span> Menu Catalog</span>
+        </div>
+        <h2 class="text-5xl font-extrabold text-orange-600">Manage Menu Items</h2>
+        <p class="text-gray-500 mt-2 text-sm font-medium" style="font-family:'Roboto',sans-serif;">View, edit, and remove dishes from your menu</p>
+      </div>
+
+      <!-- Search & Filter Bar -->
+      <div id="menuToolbar" class="max-w-4xl mx-auto mb-6 hidden">
+        <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+          <div class="search-input-wrapper flex-1">
+            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input id="menuSearchInput" type="text" placeholder="Search dishes by name..." class="enhanced-input w-full">
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button class="filter-pill active" data-filter="all">All</button>
+            <button class="filter-pill" data-filter="Standard">🍽️ Standard</button>
+            <button class="filter-pill" data-filter="Weight Loss">🥗 Weight Loss</button>
+            <button class="filter-pill" data-filter="Weight Gain">💪 Weight Gain</button>
+            <button class="filter-pill" data-filter="Balanced">⚖️ Balanced</button>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mt-3">
+          <span id="menuItemCount" class="text-xs font-bold px-2.5 py-1 rounded-full bg-orange-100 text-orange-700" style="font-family:'Roboto',sans-serif;">0 items</span>
+          <span id="menuFilterStatus" class="text-xs text-gray-400" style="font-family:'Roboto',sans-serif;"></span>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div id="menuLoadingMessage" class="text-center text-gray-500 text-lg py-8">
+        <svg class="w-8 h-8 mx-auto mb-2 text-gray-300 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        Loading menu...
+      </div>
+
+      <!-- Menu Items Card Grid -->
+      <div id="menuItemsContainer" class="hidden">
+        <div id="menuItemsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+          <!-- Cards injected here -->
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div id="menuStatusMessage" class="text-center text-gray-500 text-lg hidden py-8">
+        <svg class="w-10 h-10 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        <span>No menu items found</span>
+      </div>
+    </section>
+
+    <section class="bg-white/70 p-8 rounded-3xl shadow-xl backdrop-blur-lg mt-8 animate-fade-in">
+      <!-- Section Header -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center gap-2 mb-3">
+          <span class="section-badge"><span class="badge-dot"></span> Menu Management</span>
+        </div>
+        <h2 class="text-5xl font-extrabold text-orange-600">Add New Menu Item</h2>
+        <p class="text-gray-500 mt-2 text-sm font-medium" style="font-family:'Roboto',sans-serif;">Create a delicious new dish for your customers</p>
+      </div>
+
+      <form id="addMenuItemForm" class="max-w-4xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- LEFT: Dish Details Card -->
+          <div class="form-section-card animate-slide-in" style="animation-delay: 0.1s;">
+            <div class="flex items-center gap-2 mb-5">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+              </div>
+              <h3 class="text-lg font-bold text-gray-800" style="font-family:'Roboto',sans-serif;">Dish Details</h3>
+            </div>
+            <div class="space-y-4">
+              <div class="form-group">
+                <label for="menu-item-name">
+                  <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                  Dish Name
+                </label>
+                <input id="menu-item-name" type="text" required class="enhanced-input" placeholder="e.g., Grilled Chicken Salad">
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="form-group">
+                  <label for="menu-item-price">
+                    <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Price (₹)
+                  </label>
+                  <input id="menu-item-price" type="number" step="0.01" required class="enhanced-input" placeholder="249.00">
+                </div>
+                <div class="form-group">
+                  <label for="menu-item-category">
+                    <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    Category
+                  </label>
+                  <select id="menu-item-category" required class="enhanced-select">
+                    <option value="">Select a category...</option>
+                    <option value="Standard">🍽️ Standard</option>
+                    <option value="Weight Loss">🥗 Weight Loss</option>
+                    <option value="Weight Gain">💪 Weight Gain</option>
+                    <option value="Balanced">⚖️ Balanced</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="menu-item-description">
+                  <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+                  Description
+                </label>
+                <textarea id="menu-item-description" rows="3" class="enhanced-textarea" placeholder="Describe this dish to make it irresistible..."></textarea>
+              </div>
+              <div class="form-group">
+                <label for="menu-item-image-url">
+                  <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                  Image URL
+                </label>
+                <input id="menu-item-image-url" type="text" placeholder="https://example.com/dish-photo.jpg" class="enhanced-input">
+                <div id="imagePreviewBox" class="image-preview-box">
+                  <span class="placeholder-text">
+                    <svg class="w-6 h-6 mx-auto mb-1 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    Image preview will appear here
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Nutrition & Ingredients Card -->
+          <div class="form-section-card animate-slide-in" style="animation-delay: 0.25s;">
+            <div class="flex items-center gap-2 mb-5">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+              </div>
+              <h3 class="text-lg font-bold text-gray-800" style="font-family:'Roboto',sans-serif;">Nutrition & Ingredients</h3>
+            </div>
+            <div class="space-y-4">
+              <div class="form-group">
+                <label for="menu-item-ingredients">
+                  <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                  Ingredients
+                </label>
+                <input id="menu-item-ingredients" type="text" placeholder="Chicken, Lettuce, Tomato, Olive Oil" required class="enhanced-input">
+                <p class="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+                  Separate ingredients with commas
+                </p>
+              </div>
+
+              <!-- Nutrition Inputs as Grid -->
+              <div class="form-group">
+                <label>
+                  <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                  Nutrition Facts
+                </label>
+                <div class="grid grid-cols-2 gap-3 mt-1">
+                  <div class="form-group">
+                    <label for="menu-item-calories" class="text-xs" style="font-size:0.7rem;">🔥 Calories (kcal)</label>
+                    <input id="menu-item-calories" type="number" value="0" required class="enhanced-input" style="padding:0.5rem 0.75rem;">
+                  </div>
+                  <div class="form-group">
+                    <label for="menu-item-protein" class="text-xs" style="font-size:0.7rem;">🥩 Protein (g)</label>
+                    <input id="menu-item-protein" type="number" step="0.1" value="0" required class="enhanced-input" style="padding:0.5rem 0.75rem;">
+                  </div>
+                  <div class="form-group">
+                    <label for="menu-item-carbs" class="text-xs" style="font-size:0.7rem;">🌾 Carbs (g)</label>
+                    <input id="menu-item-carbs" type="number" step="0.1" value="0" required class="enhanced-input" style="padding:0.5rem 0.75rem;">
+                  </div>
+                  <div class="form-group">
+                    <label for="menu-item-fat" class="text-xs" style="font-size:0.7rem;">🧈 Fat (g)</label>
+                    <input id="menu-item-fat" type="number" step="0.1" value="0" required class="enhanced-input" style="padding:0.5rem 0.75rem;">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Live Nutrition Preview -->
+              <div>
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2" style="font-family:'Roboto',sans-serif;">Live Nutrition Preview</p>
+                <div class="nutrition-bar-container" id="nutritionPreview">
+                  <div class="nutrition-mini-card" style="--nut-color: #ef4444;">
+                    <div class="nut-icon">🔥</div>
+                    <div class="nut-value" id="preview-cal">0</div>
+                    <div class="nut-label">Calories</div>
+                  </div>
+                  <div class="nutrition-mini-card" style="--nut-color: #8b5cf6;">
+                    <div class="nut-icon">🥩</div>
+                    <div class="nut-value" id="preview-protein">0g</div>
+                    <div class="nut-label">Protein</div>
+                  </div>
+                  <div class="nutrition-mini-card" style="--nut-color: #f59e0b;">
+                    <div class="nut-icon">🌾</div>
+                    <div class="nut-value" id="preview-carbs">0g</div>
+                    <div class="nut-label">Carbs</div>
+                  </div>
+                  <div class="nutrition-mini-card" style="--nut-color: #10b981;">
+                    <div class="nut-icon">🧈</div>
+                    <div class="nut-value" id="preview-fat">0g</div>
+                    <div class="nut-label">Fat</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center mt-8">
+          <button type="submit" class="btn-primary text-white font-bold py-4 px-12 rounded-full text-lg shadow-lg inline-flex items-center gap-3 group">
+            <svg class="w-5 h-5 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Add Dish to Menu
+          </button>
+          <div id="addMenuStatus" class="text-center text-lg mt-4 font-semibold"></div>
+        </div>
+      </form>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- MANAGE DELIVERY PARTNERS - Enhanced Section               -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section class="bg-white/70 p-8 rounded-3xl shadow-xl backdrop-blur-lg mt-8 animate-fade-in">
+      <!-- Section Header -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center gap-2 mb-3">
+          <span class="section-badge"><span class="badge-dot"></span> Partner Management</span>
+        </div>
+        <h2 class="text-5xl font-extrabold text-orange-600">Manage Delivery Partners</h2>
+        <p class="text-gray-500 mt-2 text-sm font-medium" style="font-family:'Roboto',sans-serif;">Add and manage your delivery fleet</p>
+      </div>
+
+      <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <!-- LEFT: Add New Partner Form (2 cols) -->
+        <div class="lg:col-span-2">
+          <div class="add-partner-card">
+            <div class="flex items-center gap-2 mb-5">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+              </div>
+              <h3 class="text-lg font-bold text-gray-800" style="font-family:'Roboto',sans-serif;">Add New Partner</h3>
+            </div>
+            <form id="addPartnerForm" class="space-y-4">
+              <div class="form-group">
+                <label for="partner-name">
+                  <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                  Partner Name
+                </label>
+                <input type="text" id="partner-name" required class="enhanced-input" placeholder="e.g., Raj Kumar">
+              </div>
+              <div class="form-group">
+                <label for="partner-email">
+                  <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                  Partner Email
+                </label>
+                <input type="email" id="partner-email" required class="enhanced-input" placeholder="partner@email.com">
+              </div>
+              <div class="pt-2">
+                <button type="submit" class="btn-primary text-white font-bold py-3 px-8 rounded-full text-base shadow-lg w-full inline-flex items-center justify-center gap-2 group">
+                  <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                  Add Partner
+                </button>
+              </div>
+            </form>
+            <div id="addPartnerStatus" class="text-center text-lg mt-4 font-semibold"></div>
+            <div id="generatedPasswordDisplay" class="mt-4 hidden">
+              <div class="password-reveal-card">
+                <div class="pw-icon">
+                  <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                </div>
+                <div>
+                  <p class="text-xs font-semibold text-amber-800 uppercase tracking-wide">Temporary Password</p>
+                  <p class="text-sm font-bold text-amber-900 mt-0.5" id="generatedPassword"></p>
+                  <p class="text-xs text-amber-700 mt-1">Share this securely with the partner</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Existing Partners (3 cols) -->
+        <div class="lg:col-span-3">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800" style="font-family:'Roboto',sans-serif;">Active Partners</h3>
+            <span id="partnerCount" class="ml-auto text-xs font-bold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 hidden">0</span>
+          </div>
+          <div id="partnersLoadingMessage" class="text-center text-gray-500 text-lg py-8">
+            <svg class="w-8 h-8 mx-auto mb-2 text-gray-300 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            Loading partners...
+          </div>
+          <div id="partnersContainer" class="hidden">
+            <div id="partnersCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <!-- Partner cards will be injected here -->
+            </div>
+          </div>
+          <div id="partnersStatusMessage" class="text-center text-gray-500 text-lg hidden py-8">
+            <svg class="w-10 h-10 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <span>No delivery partners found</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="editMenuItemModal" class="modal hidden">
+    <div class="modal-content">
+      <span id="closeEditModalBtn" class="close-button">&times;</span>
+      <h3 class="text-4xl font-extrabold text-center text-orange-600 mb-8">Edit Menu Item</h3>
+      <form id="editMenuItemForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <input type="hidden" id="edit-menu-item-id">
+        <div class="flex flex-col space-y-4">
+          <div>
+            <label for="edit-menu-item-name" class="block text-sm font-medium text-gray-700">Dish Name</label>
+            <input id="edit-menu-item-name" type="text" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+          </div>
+          <div>
+            <label for="edit-menu-item-price" class="block text-sm font-medium text-gray-700">Price (₹)</label>
+            <input id="edit-menu-item-price" type="number" step="0.01" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+          </div>
+          <div>
+            <label for="edit-menu-item-category" class="block text-sm font-medium text-gray-700">Category</label>
+            <select id="edit-menu-item-category" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+              <option value="">Select a category...</option>
+              <option value="Standard">Standard</option>
+              <option value="Weight Loss">Weight Loss</option>
+              <option value="Weight Gain">Weight Gain</option>
+               <option value="Balanced">Balanced</option> </select>
+          </div>
+           <div>
+            <label for="edit-menu-item-image-url" class="block text-sm font-medium text-gray-700">Image URL</label>
+            <input id="edit-menu-item-image-url" type="text" placeholder="e.g., http://.../image.png" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+          </div>
+          <div>
+            <label for="edit-menu-item-description" class="block text-sm font-medium text-gray-700">Description</label>
+            <textarea id="edit-menu-item-description" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"></textarea>
+          </div>
+        </div>
+        <div class="flex flex-col space-y-4">
+          <div>
+            <label for="edit-menu-item-ingredients" class="block text-sm font-medium text-gray-700">Ingredients</label>
+            <input id="edit-menu-item-ingredients" type="text" placeholder="e.g., Chicken, Lettuce, Tomato" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+            <p class="text-xs text-gray-500 mt-1">Separate with commas.</p>
+          </div>
+          <div>
+            <label for="edit-menu-item-calories" class="block text-sm font-medium text-gray-700">Calories (kcal)</label>
+            <input id="edit-menu-item-calories" type="number" value="0" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+          </div>
+          <div>
+            <label for="edit-menu-item-protein" class="block text-sm font-medium text-gray-700">Protein (g)</label>
+            <input id="edit-menu-item-protein" type="number" step="0.1" value="0" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+          </div>
+          <div>
+            <label for="edit-menu-item-carbs" class="block text-sm font-medium text-gray-700">Carbs (g)</label>
+            <input id="edit-menu-item-carbs" type="number" step="0.1" value="0" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+          </div>
+          <div>
+            <label for="edit-menu-item-fat" class="block text-sm font-medium text-gray-700">Fat (g)</label>
+            <input id="edit-menu-item-fat" type="number" step="0.1" value="0" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500">
+          </div>
+        </div>
+        <div class="md:col-span-2 text-center mt-4">
+          <button type="submit" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-md hover:bg-blue-800 transition">Save Changes</button>
+          <div id="editMenuStatus" class="text-center text-lg mt-4 font-semibold"></div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const backendBaseUrl = 'http://localhost:3000';
+      const logoutBtn = document.getElementById('logoutBtn');
+
+      // --- Order elements ---
+      const ordersTableBody = document.getElementById('ordersTableBody');
+      const loadingMessage = document.getElementById('loadingMessage');
+      const ordersContainer = document.getElementById('ordersContainer');
+      const statusMessage = document.getElementById('statusMessage');
+
+      // --- Add Menu Item elements ---
+      const addMenuItemForm = document.getElementById('addMenuItemForm');
+      const addMenuStatus = document.getElementById('addMenuStatus');
+
+      // --- Manage Menu Item elements ---
+      const menuLoadingMessage = document.getElementById('menuLoadingMessage');
+      const menuItemsContainer = document.getElementById('menuItemsContainer');
+      const menuItemsGrid = document.getElementById('menuItemsGrid');
+      const menuStatusMessage = document.getElementById('menuStatusMessage');
+      const menuToolbar = document.getElementById('menuToolbar');
+      const menuSearchInput = document.getElementById('menuSearchInput');
+      const menuItemCountEl = document.getElementById('menuItemCount');
+      const menuFilterStatusEl = document.getElementById('menuFilterStatus');
+      let allMenuItems = []; // Store all menu items here for editing
+      let currentMenuFilter = 'all';
+      let currentMenuSearch = '';
+
+      // --- Edit Modal elements ---
+      const editMenuItemModal = document.getElementById('editMenuItemModal');
+      const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+      const editMenuItemForm = document.getElementById('editMenuItemForm');
+      const editMenuStatus = document.getElementById('editMenuStatus');
+      const editMenuItemId = document.getElementById('edit-menu-item-id'); // Hidden input
+
+      // --- Delivery Partner Elements ---
+      const addPartnerForm = document.getElementById('addPartnerForm');
+      const addPartnerStatus = document.getElementById('addPartnerStatus');
+      const generatedPasswordDisplay = document.getElementById('generatedPasswordDisplay');
+      const generatedPasswordEl = document.getElementById('generatedPassword');
+      const partnersLoadingMessage = document.getElementById('partnersLoadingMessage');
+      const partnersContainer = document.getElementById('partnersContainer');
+      const partnersCardsGrid = document.getElementById('partnersCardsGrid');
+      const partnersStatusMessage = document.getElementById('partnersStatusMessage');
+      const partnerCountBadge = document.getElementById('partnerCount');
+
+      // --- Image Preview Elements ---
+      const imageUrlInput = document.getElementById('menu-item-image-url');
+      const imagePreviewBox = document.getElementById('imagePreviewBox');
+
+      // --- Nutrition Preview Elements ---
+      const caloriesInput = document.getElementById('menu-item-calories');
+      const proteinInput = document.getElementById('menu-item-protein');
+      const carbsInput = document.getElementById('menu-item-carbs');
+      const fatInput = document.getElementById('menu-item-fat');
+      const previewCal = document.getElementById('preview-cal');
+      const previewProtein = document.getElementById('preview-protein');
+      const previewCarbs = document.getElementById('preview-carbs');
+      const previewFat = document.getElementById('preview-fat');
+
+      // --- Utility: Show Toast Notification ---
+      function showAlert(message, type = 'success', duration = 3500) {
+          // Remove any existing toasts
+          document.querySelectorAll('.toast-notification').forEach(t => t.remove());
+          const toast = document.createElement('div');
+          toast.className = `toast-notification ${type}`;
+          const icon = type === 'success'
+            ? '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+            : '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+          toast.innerHTML = `${icon}<span>${message}</span>`;
+          document.body.appendChild(toast);
+          setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(50px)';
+            toast.style.transition = 'all 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+          }, duration);
+      }
+
+      // --- Image URL Live Preview ---
+      let imageDebounce;
+      imageUrlInput.addEventListener('input', () => {
+        clearTimeout(imageDebounce);
+        imageDebounce = setTimeout(() => {
+          const url = imageUrlInput.value.trim();
+          if (url) {
+            const img = new Image();
+            img.onload = () => {
+              imagePreviewBox.innerHTML = '';
+              imagePreviewBox.appendChild(img);
+              imagePreviewBox.style.borderColor = '#10b981';
+              imagePreviewBox.style.borderStyle = 'solid';
+            };
+            img.onerror = () => {
+              imagePreviewBox.innerHTML = '<span class="placeholder-text" style="color:#ef4444;">⚠️ Could not load image</span>';
+              imagePreviewBox.style.borderColor = '#ef4444';
+            };
+            img.src = url;
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '100%';
+            img.style.objectFit = 'contain';
+            img.style.borderRadius = '0.5rem';
+          } else {
+            imagePreviewBox.innerHTML = '<span class="placeholder-text"><svg class="w-6 h-6 mx-auto mb-1 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Image preview will appear here</span>';
+            imagePreviewBox.style.borderColor = '#d1d5db';
+            imagePreviewBox.style.borderStyle = 'dashed';
+          }
+        }, 400);
+      });
+
+      // --- Live Nutrition Preview ---
+      function updateNutritionPreview() {
+        previewCal.textContent = caloriesInput.value || '0';
+        previewProtein.textContent = (proteinInput.value || '0') + 'g';
+        previewCarbs.textContent = (carbsInput.value || '0') + 'g';
+        previewFat.textContent = (fatInput.value || '0') + 'g';
+      }
+      [caloriesInput, proteinInput, carbsInput, fatInput].forEach(input => {
+        input.addEventListener('input', updateNutritionPreview);
+      });
+
+      // --- Edit Modal open/close functions ---
+      function openEditModal(item) {
+        editMenuItemId.value = item.id;
+        document.getElementById('edit-menu-item-name').value = item.name;
+        document.getElementById('edit-menu-item-price').value = item.price;
+        document.getElementById('edit-menu-item-category').value = item.category;
+        document.getElementById('edit-menu-item-image-url').value = item.image_url || '';
+        document.getElementById('edit-menu-item-description').value = item.description || '';
+        document.getElementById('edit-menu-item-ingredients').value = Array.isArray(item.ingredients) ? item.ingredients.join(', ') : '';
+        document.getElementById('edit-menu-item-calories').value = item.nutrition?.calories || 0;
+        document.getElementById('edit-menu-item-protein').value = item.nutrition?.protein_g || 0;
+        document.getElementById('edit-menu-item-carbs').value = item.nutrition?.carbs_g || 0;
+        document.getElementById('edit-menu-item-fat').value = item.nutrition?.fat_g || 0;
+
+        editMenuStatus.textContent = '';
+        editMenuItemModal.classList.remove('hidden');
+        editMenuItemModal.classList.add('flex');
+      }
+
+      function closeEditModal() {
+        editMenuItemModal.classList.add('hidden');
+        editMenuItemModal.classList.remove('flex');
+      }
+
+      // --- Modal Listeners ---
+      closeEditModalBtn.addEventListener('click', closeEditModal);
+      window.addEventListener('click', (event) => {
+        if (event.target == editMenuItemModal) {
+            closeEditModal();
+        }
+      });
+
+      // --- Fetch Orders ---
+      async function fetchOrders() {
+        const token = localStorage.getItem('token');
+        const userRole = localStorage.getItem('userRole');
+
+        if (!token || userRole !== 'admin') {
+          // Redirect if not admin (this check might be redundant if server protects routes, but good for UX)
+          // Consider only fetching if role is admin on page load.
+          window.location.href = 'index.html';
+          return;
+        }
+
+        loadingMessage.classList.remove('hidden');
+        ordersContainer.classList.add('hidden');
+        statusMessage.classList.add('hidden');
+
+        try {
+          const response = await fetch(`${backendBaseUrl}/api/admin/orders`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          loadingMessage.classList.add('hidden');
+
+          if (response.ok) {
+            const orders = await response.json();
+            if (orders.length > 0) {
+              ordersContainer.classList.remove('hidden');
+              statusMessage.classList.add('hidden');
+              renderOrders(orders);
+            } else {
+              statusMessage.textContent = 'No orders have been placed yet.';
+              statusMessage.classList.remove('hidden');
+            }
+          } else {
+            const errorData = await response.json(); // Try to get JSON error
+            console.error('Failed to fetch orders:', response.status, errorData.message);
+            statusMessage.textContent = `Failed to load orders: ${errorData.message || response.statusText}`;
+            statusMessage.classList.remove('hidden');
+          }
+        } catch (error) {
+          console.error('Network error fetching orders:', error);
+          loadingMessage.classList.add('hidden');
+          statusMessage.textContent = 'Network error: Could not connect to the server.';
+          statusMessage.classList.remove('hidden');
+        }
+      }
+
+      // --- Render Orders ---
+      function renderOrders(orders) {
+        ordersTableBody.innerHTML = '';
+        orders.forEach(order => {
+          const orderDate = new Date(order.orderDate);
+          const dateString = orderDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }); // Use locale
+          const timeString = orderDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }); // Use locale
+
+          const foodItemsHtml = order.cartItems.map(item => `${item.quantity}x ${item.name || 'Unknown'}`).join('<br>');
+
+          const row = document.createElement('tr');
+          row.className = 'border-b border-gray-200 hover:bg-gray-100';
+          row.innerHTML = `
+            <td class="py-3 px-6 text-left whitespace-nowrap">${order.orderId}</td>
+            <td class="py-3 px-6 text-left">${order.customerName || '-'}</td>
+            <td class="py-3 px-6 text-left">${foodItemsHtml}</td>
+            <td class="py-3 px-6 text-left">${dateString} ${timeString}</td>
+            <td class="py-3 px-6 text-left">₹${order.totalPrice.toFixed(2)}</td>
+            <td class="py-3 px-6 text-left">${order.status || 'Pending'}</td>
+            <td class="py-3 px-6 text-left">${order.deliveryAddress || '-'}</td>
+            <td class="py-3 px-6 text-left">${order.customerPhone || '-'}</td>
+            <td class="py-3 px-6 text-left">${order.paymentMethod || 'COD'}</td>
+            <td class="py-3 px-6 text-left">${order.deliveryPartnerName || 'Not Assigned'}</td> `;
+          ordersTableBody.appendChild(row);
+        });
+      }
+
+      // --- Logout ---
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userRole');
+        window.location.href = 'index.html'; // Redirect to home on logout
+      });
+
+      // --- Add Menu Item Logic ---
+      addMenuItemForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const token = localStorage.getItem('token');
+          if (!token) { showAlert('Authentication error. Please log in again.', 'error'); return; }
+
+          addMenuStatus.textContent = 'Submitting...';
+          addMenuStatus.className = 'text-center text-lg mt-4 font-semibold text-gray-600';
+
+          const name = document.getElementById('menu-item-name').value.trim();
+          const price = document.getElementById('menu-item-price').value;
+          const description = document.getElementById('menu-item-description').value.trim();
+          const image_url = document.getElementById('menu-item-image-url').value.trim();
+          const category = document.getElementById('menu-item-category').value;
+          const ingredients = document.getElementById('menu-item-ingredients').value
+                                .split(',')
+                                .map(s => s.trim())
+                                .filter(Boolean); // Filter empty strings
+          const nutrition = {
+              calories: parseFloat(document.getElementById('menu-item-calories').value) || 0,
+              protein_g: parseFloat(document.getElementById('menu-item-protein').value) || 0,
+              carbs_g: parseFloat(document.getElementById('menu-item-carbs').value) || 0,
+              fat_g: parseFloat(document.getElementById('menu-item-fat').value) || 0
+          };
+
+          if (!name || !price || !category) {
+              showAlert('Name, Price, and Category are required.', 'error'); return;
+          }
+           if (parseFloat(price) < 0) {
+              showAlert('Price cannot be negative.', 'error'); return;
+           }
+          if (ingredients.length === 0) {
+              showAlert('Please provide at least one ingredient.', 'error'); return;
+          }
+
+          const newItemData = { name, price, description, image_url, category, ingredients, nutrition };
+          const submitButton = addMenuItemForm.querySelector('button[type="submit"]');
+          submitButton.disabled = true;
+
+          try {
+              const response = await fetch(`${backendBaseUrl}/api/admin/menu_items`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                  body: JSON.stringify(newItemData)
+              });
+              const data = await response.json();
+
+              if (response.ok) {
+                  showAlert('Success! Item added.', 'success');
+                  addMenuItemForm.reset();
+                  // Reset live previews
+                  updateNutritionPreview();
+                  imagePreviewBox.innerHTML = '<span class="placeholder-text"><svg class="w-6 h-6 mx-auto mb-1 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Image preview will appear here</span>';
+                  imagePreviewBox.style.borderColor = '#d1d5db';
+                  imagePreviewBox.style.borderStyle = 'dashed';
+                  fetchMenuItems(); // Refresh menu list
+              } else {
+                   showAlert(`Error: ${data.message || 'Failed to add item.'}`, 'error');
+              }
+          } catch (error) {
+              console.error('Error adding menu item:', error);
+              showAlert('Network error. Could not connect.', 'error');
+          } finally {
+              submitButton.disabled = false; // Re-enable button
+          }
+      });
+
+      // --- Fetch Menu Items ---
+      async function fetchMenuItems() {
+          menuLoadingMessage.classList.remove('hidden');
+          menuItemsContainer.classList.add('hidden');
+          menuStatusMessage.classList.add('hidden');
+          menuToolbar.classList.add('hidden');
+          const token = localStorage.getItem('token');
+          const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+          try {
+              const response = await fetch(`${backendBaseUrl}/api/menu_items`, { headers });
+
+              menuLoadingMessage.classList.add('hidden');
+
+              if (response.ok) {
+                  const items = await response.json();
+                  allMenuItems = items.map(item => ({...item, price: parseFloat(item.price) || 0}));
+
+                  if (allMenuItems.length > 0) {
+                      menuItemsContainer.classList.remove('hidden');
+                      menuToolbar.classList.remove('hidden');
+                      // Reset search/filter
+                      currentMenuSearch = '';
+                      currentMenuFilter = 'all';
+                      menuSearchInput.value = '';
+                      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+                      document.querySelector('.filter-pill[data-filter="all"]').classList.add('active');
+                      renderMenuItems(allMenuItems);
+                  } else {
+                      menuStatusMessage.classList.remove('hidden');
+                  }
+              } else {
+                  const errorData = await response.json();
+                  console.error('Failed to fetch menu:', response.status, errorData.message);
+                  menuStatusMessage.textContent = `Failed to load menu: ${errorData.message || response.statusText}`;
+                  menuStatusMessage.classList.remove('hidden');
+              }
+          } catch (error) {
+              console.error('Network error fetching menu items:', error);
+              menuLoadingMessage.classList.add('hidden');
+              menuStatusMessage.textContent = 'Network error: Could not connect to the server.';
+              menuStatusMessage.classList.remove('hidden');
+          }
+      }
+
+      // --- Render Menu Items ---
+      function getCategoryBadgeClass(category) {
+        if (!category) return 'other';
+        const cat = category.toLowerCase().replace(/\s+/g, '-');
+        if (cat === 'standard') return 'standard';
+        if (cat === 'weight-loss') return 'weight-loss';
+        if (cat === 'weight-gain') return 'weight-gain';
+        if (cat === 'balanced') return 'balanced';
+        return 'other';
+      }
+      function getCategoryEmoji(category) {
+        if (!category) return '📋';
+        const cat = category.toLowerCase();
+        if (cat === 'standard') return '🍽️';
+        if (cat === 'weight loss') return '🥗';
+        if (cat === 'weight gain') return '💪';
+        if (cat === 'balanced') return '⚖️';
+        return '📋';
+      }
+
+      function renderMenuItems(items) {
+          menuItemsGrid.innerHTML = '';
+          // Update count
+          menuItemCountEl.textContent = `${items.length} item${items.length !== 1 ? 's' : ''}`;
+
+          if (items.length === 0 && (currentMenuSearch || currentMenuFilter !== 'all')) {
+            menuFilterStatusEl.textContent = 'No items match your search or filter';
+          } else {
+            menuFilterStatusEl.textContent = '';
+          }
+
+          items.forEach((item, idx) => {
+              const badgeClass = getCategoryBadgeClass(item.category);
+              const emoji = getCategoryEmoji(item.category);
+              const cal = item.nutrition?.calories || 0;
+              const protein = item.nutrition?.protein_g || 0;
+              const carbs = item.nutrition?.carbs_g || 0;
+              const fat = item.nutrition?.fat_g || 0;
+              const hasImage = item.image_url && item.image_url.trim();
+
+              const card = document.createElement('div');
+              card.className = 'menu-item-card animate-scale-in';
+              card.style.animationDelay = `${idx * 0.05}s`;
+              card.innerHTML = `
+                <div class="card-img">
+                  ${hasImage
+                    ? `<img src="${item.image_url}" alt="${item.name}" onerror="this.parentElement.innerHTML='<div class=\'no-img\'><svg class=\'w-8 h-8\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z\'/></svg><span>No image</span></div>'">`
+                    : `<div class="no-img"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><span>No image</span></div>`
+                  }
+                </div>
+                <div class="card-body">
+                  <div class="flex items-start justify-between gap-2 mb-1.5">
+                    <p class="card-title truncate" title="${item.name}">${item.name}</p>
+                    <span class="card-price flex-shrink-0">₹${item.price.toFixed(0)}</span>
+                  </div>
+                  <div class="mb-2">
+                    <span class="category-badge ${badgeClass}">${emoji} ${item.category || 'Other'}</span>
+                  </div>
+                  <div class="flex flex-wrap gap-1 mb-2">
+                    <span class="nutrition-chip">🔥 ${cal}</span>
+                    <span class="nutrition-chip">🥩 ${protein}g</span>
+                    <span class="nutrition-chip">🌾 ${carbs}g</span>
+                    <span class="nutrition-chip">🧈 ${fat}g</span>
+                  </div>
+                  <div class="menu-card-actions">
+                    <button class="edit-btn" data-item-id="${item.id}">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                      Edit
+                    </button>
+                    <button class="delete-btn" data-item-id="${item.id}" data-item-name="${item.name}">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              `;
+              menuItemsGrid.appendChild(card);
+          });
+      }
+
+      // --- Search & Filter Logic ---
+      function applyMenuFilters() {
+        let filtered = allMenuItems;
+        if (currentMenuFilter !== 'all') {
+          filtered = filtered.filter(item => item.category === currentMenuFilter);
+        }
+        if (currentMenuSearch) {
+          const q = currentMenuSearch.toLowerCase();
+          filtered = filtered.filter(item => item.name.toLowerCase().includes(q));
+        }
+        renderMenuItems(filtered);
+      }
+
+      menuSearchInput.addEventListener('input', (e) => {
+        currentMenuSearch = e.target.value.trim();
+        applyMenuFilters();
+      });
+
+      document.querySelectorAll('.filter-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          currentMenuFilter = pill.dataset.filter;
+          applyMenuFilters();
+        });
+      });
+
+      // --- Edit/Delete Button Listeners ---
+      menuItemsGrid.addEventListener('click', (e) => {
+          const target = e.target;
+          const editButton = target.closest('.edit-btn');
+          const deleteButton = target.closest('.delete-btn');
+
+          if (editButton) {
+              const itemId = editButton.dataset.itemId;
+              const itemToEdit = allMenuItems.find(item => item.id == itemId); // Use == for potential type mismatch
+              if (itemToEdit) {
+                  openEditModal(itemToEdit);
+              } else {
+                  showAlert('Error: Item details not found.', 'error');
+              }
+          }
+
+          if (deleteButton) {
+              const itemId = deleteButton.dataset.itemId;
+              const itemName = deleteButton.dataset.itemName;
+              if (confirm(`Are you sure you want to delete \"${itemName}\"? This cannot be undone.`)) {
+                  deleteMenuItem(itemId);
+              }
+          }
+      });
+
+      // --- Edit Form Submission Logic ---
+      editMenuItemForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const token = localStorage.getItem('token');
+          if (!token) { showAlert('Authentication error. Please log in again.', 'error'); return; }
+
+          editMenuStatus.textContent = 'Saving...';
+          editMenuStatus.className = 'text-center text-lg mt-4 font-semibold text-gray-600';
+
+          const itemId = editMenuItemId.value;
+          const updatedData = {
+              name: document.getElementById('edit-menu-item-name').value.trim(),
+              price: document.getElementById('edit-menu-item-price').value,
+              description: document.getElementById('edit-menu-item-description').value.trim(),
+              image_url: document.getElementById('edit-menu-item-image-url').value.trim(),
+              category: document.getElementById('edit-menu-item-category').value,
+              ingredients: document.getElementById('edit-menu-item-ingredients').value
+                             .split(',')
+                             .map(s => s.trim())
+                             .filter(Boolean),
+              nutrition: {
+                  calories: parseFloat(document.getElementById('edit-menu-item-calories').value) || 0,
+                  protein_g: parseFloat(document.getElementById('edit-menu-item-protein').value) || 0,
+                  carbs_g: parseFloat(document.getElementById('edit-menu-item-carbs').value) || 0,
+                  fat_g: parseFloat(document.getElementById('edit-menu-item-fat').value) || 0
+              }
+          };
+
+          if (!updatedData.name || !updatedData.price || !updatedData.category) {
+              showAlert('Name, Price, and Category are required.', 'error'); return;
+          }
+           if (parseFloat(updatedData.price) < 0) {
+              showAlert('Price cannot be negative.', 'error'); return;
+           }
+          if (updatedData.ingredients.length === 0) {
+               showAlert('Please provide at least one ingredient.', 'error'); return;
+          }
+
+          const submitButton = editMenuItemForm.querySelector('button[type="submit"]');
+          submitButton.disabled = true;
+
+          try {
+              const response = await fetch(`${backendBaseUrl}/api/admin/menu_items/${itemId}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                  body: JSON.stringify(updatedData)
+              });
+              const data = await response.json();
+              if (response.ok) {
+                  showAlert('Success! Item updated.', 'success');
+                  setTimeout(() => {
+                      closeEditModal();
+                      fetchMenuItems(); // Refresh the list
+                  }, 1000);
+              } else {
+                   showAlert(`Error: ${data.message || 'Failed to update item.'}`, 'error');
+              }
+          } catch (error) {
+               showAlert('Network error. Could not save changes.', 'error');
+          } finally {
+               submitButton.disabled = false;
+          }
+      });
+
+      // --- Delete Item Function ---
+      async function deleteMenuItem(itemId) {
+          const token = localStorage.getItem('token');
+          if (!token) { showAlert('Authentication error.', 'error'); return; }
+
+          try {
+              const response = await fetch(`${backendBaseUrl}/api/admin/menu_items/${itemId}`, {
+                  method: 'DELETE',
+                  headers: { 'Authorization': `Bearer ${token}` }
+              });
+
+              if (response.ok) {
+                  showAlert('Item deleted successfully.', 'success');
+                  fetchMenuItems(); // Refresh list
+              } else {
+                  const data = await response.json();
+                  showAlert(`Error: ${data.message || 'Failed to delete item.'}`, 'error');
+              }
+          } catch (error) {
+              console.error('Error deleting item:', error);
+              showAlert('Network error. Could not delete item.', 'error');
+          }
+      }
+
+      // --- Fetch Delivery Partners ---
+      async function fetchDeliveryPartners() {
+          partnersLoadingMessage.classList.remove('hidden');
+          partnersContainer.classList.add('hidden');
+          partnersStatusMessage.classList.add('hidden');
+          generatedPasswordDisplay.classList.add('hidden');
+          const token = localStorage.getItem('token');
+
+          try {
+              const response = await fetch(`${backendBaseUrl}/api/admin/delivery_partners`, {
+                  headers: { 'Authorization': `Bearer ${token}` }
+              });
+              partnersLoadingMessage.classList.add('hidden');
+
+              if (response.ok) {
+                  const partners = await response.json();
+                  if (partners.length > 0) {
+                      partnersContainer.classList.remove('hidden');
+                      renderDeliveryPartners(partners);
+                  } else {
+                      partnersStatusMessage.textContent = 'No delivery partners found.';
+                      partnersStatusMessage.classList.remove('hidden');
+                  }
+              } else {
+                   const errorData = await response.json();
+                   partnersStatusMessage.textContent = `Failed to load partners: ${errorData.message || response.statusText}`;
+                   partnersStatusMessage.classList.remove('hidden');
+              }
+          } catch (error) {
+              console.error('Network error fetching partners:', error);
+              partnersLoadingMessage.classList.add('hidden');
+              partnersStatusMessage.textContent = 'Network error fetching partners.';
+              partnersStatusMessage.classList.remove('hidden');
+          }
+      }
+
+      // --- Render Delivery Partners (Cards) ---
+      const avatarColors = [
+        'linear-gradient(135deg, #f59e0b, #ef4444)',
+        'linear-gradient(135deg, #8b5cf6, #6d28d9)',
+        'linear-gradient(135deg, #10b981, #059669)',
+        'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+        'linear-gradient(135deg, #ec4899, #be185d)',
+        'linear-gradient(135deg, #14b8a6, #0d9488)',
+        'linear-gradient(135deg, #f97316, #ea580c)',
+      ];
+      function renderDeliveryPartners(partners) {
+          partnersCardsGrid.innerHTML = '';
+          // Update count badge
+          partnerCountBadge.textContent = partners.length;
+          partnerCountBadge.classList.remove('hidden');
+          partners.forEach((partner, idx) => {
+              const initials = partner.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+              const colorGrad = avatarColors[idx % avatarColors.length];
+              const card = document.createElement('div');
+              card.className = 'partner-card animate-scale-in';
+              card.style.animationDelay = `${idx * 0.08}s`;
+              card.innerHTML = `
+                <div class="flex items-center gap-3">
+                  <div class="partner-avatar" style="background: ${colorGrad};">${initials}</div>
+                  <div class="min-w-0">
+                    <p class="text-sm font-bold text-gray-800 truncate" style="font-family:'Roboto',sans-serif;">${partner.name}</p>
+                    <p class="text-xs text-gray-500 truncate">${partner.email}</p>
+                    <p class="text-xs text-gray-400 mt-0.5">#${partner.id}</p>
+                  </div>
+                </div>
+              `;
+              partnersCardsGrid.appendChild(card);
+          });
+      }
+
+      // --- Add Delivery Partner Logic ---
+      addPartnerForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const token = localStorage.getItem('token');
+           if (!token) { showAlert('Authentication error.', 'error'); return; }
+
+          addPartnerStatus.textContent = 'Adding partner...';
+          addPartnerStatus.className = 'text-center text-lg mt-4 font-semibold text-gray-600';
+          generatedPasswordDisplay.classList.add('hidden'); // Hide previous password
+
+          const name = document.getElementById('partner-name').value.trim();
+          const email = document.getElementById('partner-email').value.trim();
+          if (!name || !email) {
+               showAlert('Name and Email are required.', 'error'); return;
+          }
+
+          const submitButton = addPartnerForm.querySelector('button[type="submit"]');
+          submitButton.disabled = true;
+
+
+          try {
+              const response = await fetch(`${backendBaseUrl}/api/admin/delivery_partners`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                  body: JSON.stringify({ name, email })
+              });
+              const data = await response.json();
+
+              if (response.ok) {
+                  showAlert('Success! Partner added.', 'success');
+                  addPartnerForm.reset();
+                  // SECURITY WARNING: Displaying password is not secure
+                  generatedPasswordEl.textContent = data.temporaryPassword;
+                  generatedPasswordDisplay.classList.remove('hidden');
+                  fetchDeliveryPartners(); // Refresh the list
+              } else {
+                  showAlert(`Error: ${data.message || 'Failed to add partner.'}`, 'error');
+              }
+          } catch (error) {
+              console.error('Error adding partner:', error);
+              showAlert('Network error adding partner.', 'error');
+          } finally {
+              submitButton.disabled = false;
+          }
+      });
+
+      // --- Initial Setup ---
+      // Check if logged in as admin before fetching admin-specific data
+      const initialToken = localStorage.getItem('token');
+      const initialRole = localStorage.getItem('userRole');
+      if (initialToken && initialRole === 'admin') {
+         fetchOrders();
+         fetchMenuItems();
+         fetchDeliveryPartners();
+      } else {
+        // Handle case where user lands on admin.html but isn't logged in as admin
+        console.log("Not logged in as admin. Redirecting...");
+        // Redirect to login or home page
+        // window.location.href = 'index.html'; // Or show a login prompt
+        loadingMessage.textContent = 'Access Denied. Please log in as Admin via the main page.';
+        menuLoadingMessage.textContent = ''; // Hide other loading messages
+        partnersLoadingMessage.textContent = '';
+      }
+
+    });
+  </script>
+
+</body>
+</html>

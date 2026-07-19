@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DelishDish - Food Ordering</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@400;500;700&family=Satisfy&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-image: url('https://uniquedestination.mitsishotels.com/wp-content/uploads/2018/03/shutterstock_467823860.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            color: #4b5563;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Satisfy', cursive;
+        }
+
+        .card {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        .btn-primary {
+            background-color: #f59e0b;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #000000;
+            transform: scale(1.05);
+            animation: pulse 1s infinite;
+        }
+        .btn-secondary {
+            background-color: #1d4ed8;
+            transition: background-color 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #1e40af;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            transform: scale(0.95);
+            animation: modalFadeIn 0.3s forwards;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .close-button {
+            color: #aaa;
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .alert-box {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #22c55e;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        z-index: 1001;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        pointer-events: none;
+        }
+        .alert-box.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .alert-box.error {
+            background-color: #ef4444;
+        }
+        .text-shadow-hero {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .delish-dish-logo {
+            font-family: 'Satisfy', cursive;
+            transition: transform 0.2s ease-in-out;
+        }
+        .delish-dish-logo:hover {
+            transform: translateY(-5px) scale(1.1);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    <div id="alertBox" class="alert-box">
+        <span id="alertMessage"></span>
+    </div>
+<div id="adminLoginModal" class="modal hidden">
+<div class="modal-content">
+    <span class="close-button" id="closeAdminLoginModal">&times;</span>
+    <h3 class="text-3xl font-bold text-center text-orange-600 mb-6">Admin Login</h3>
+    <form id="adminLoginForm">
+    <div class="mb-4">
+        <label for="admin-email" class="block text-gray-700 font-bold mb-2">Email</label>
+        <input id="admin-email" type="email" class="w-full p-3 border rounded" required>
+    </div>
+    <div class="mb-6">
+        <label for="admin-password" class="block text-gray-700 font-bold mb-2">Password</label>
+        <input id="admin-password" type="password" class="w-full p-3 border rounded" required>
+    </div>
+    <button type="submit" class="btn-primary w-full text-white font-bold py-2 px-4 rounded">Login</button>
+    </form>
+</div>
+</div>
+
+    <nav class="bg-white p-4 shadow-md sticky top-0 z-50 rounded-b-xl">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="#" class="delish-dish-logo text-4xl font-extrabold text-orange-500 rounded-lg p-2 hover:bg-orange-50 transition duration-300">DelishDish</a>
+            <div class="space-x-4 flex items-center">
+                <a href="#home" class="text-lg font-medium text-gray-700 hover:text-orange-600 transition duration-300 px-3 py-2 rounded-md">Home</a>
+                <a href="#menu" class="text-lg font-medium text-gray-700 hover:text-orange-600 transition duration-300 px-3 py-2 rounded-md">Menu</a>
+                <a href="#order" class="text-lg font-medium text-gray-700 hover:text-orange-600 transition duration-300 px-3 py-2 rounded-md">Order Now</a>
+                <a href="#contact" class="text-lg font-medium text-gray-700 hover:text-orange-600 transition duration-300 px-3 py-2 rounded-md">Contact</a>
+                <a href="#" id="fitness-nav-link" class="text-lg font-medium text-gray-700 hover:text-orange-600 transition duration-300 px-3 py-2 rounded-md">Fitness</a>
+                <a href="admin.html" id="admin-login-link" class="text-lg font-medium text-gray-700 hover:text-orange-600 transition duration-300 px-3 py-2 rounded-md">Admin</a>
+                <a href="delivery.html" class="text-lg font-medium text-gray-700 hover:text-orange-600 transition duration-300 px-3 py-2 rounded-md">Delivery Partner</a>
+
+                <button id="loginBtn" class="bg-orange-500 text-white font-bold py-2 px-6 rounded-full hover:bg-black transition duration-300 shadow-md">Login</button>
+                <button id="logoutBtn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-full hover:bg-gray-700 transition duration-300 shadow-md hidden">Logout</button>
+
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="text-white py-24 px-4 text-center rounded-b-xl shadow-lg">
+        <div class="container mx-auto">
+            <h1 class="text-6xl font-extrabold mb-6 drop-shadow-lg text-shadow-hero">Savor Every Moment, Order DelishDish!</h1>
+            <p class="text-2xl mb-8 leading-relaxed font-light">Your go-to for mouth-watering meals delivered fresh to your door. Taste the difference!</p>
+            <button id="orderNowHeroBtn" class="btn-primary text-white text-xl font-bold py-4 px-10 rounded-full shadow-lg hover:shadow-xl transition transform focus:outline-none focus:ring-4 focus:ring-orange-300">
+                Explore Our Menu
+            </button>
+        </div>
+    </section>
+
+    <div class="container mx-auto py-16 px-4">
+        <section id="menu" class="mb-16">
+            <h2 class="text-5xl font-extrabold text-center text-white mb-12 drop-shadow-md">
+                Our Delicious Menu
+            </h2>
+            <div id="menuItemsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <p class="text-center text-gray-500 col-span-full" id="loadingMessage">Loading menu...</p>
+            </div>
+        </section>
+
+        <section id="order" class="p-12 rounded-3xl shadow-xl mb-16">
+            <h2 class="text-5xl font-extrabold text-center text-white mb-12 drop-shadow-md">
+                Place Your Order
+            </h2>
+            <div class="max-w-3xl mx-auto p-10 rounded-2xl shadow-lg bg-white bg-opacity-70 backdrop-filter backdrop-blur-lg">
+                <form id="orderForm" class="grid grid-cols-1 gap-8">
+                    <div>
+                        <label for="name" class="block text-xl font-semibold text-gray-700 mb-2">Your Name:</label>
+                        <input type="text" id="name" name="name" class="w-full p-4 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent" placeholder="John Doe" required>
+                    </div>
+                    <div>
+                        <label for="email" class="block text-xl font-semibold text-gray-700 mb-2">Your Email:</label>
+                        <input type="email" id="email" name="email" class="w-full p-4 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent" placeholder="you@example.com" required>
+                    </div>
+                    <div>
+                        <label for="address" class="block text-xl font-semibold text-gray-700 mb-2">Delivery Address:</label>
+                        <textarea id="address" name="address" rows="4" class="w-full p-4 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent" placeholder="123 Delicious St, Food City" required></textarea>
+                    </div>
+                    <div class="mb-6">
+                        <label for="phone" class="block text-xl font-semibold text-gray-700 mb-2">Phone Number:</label>
+                        <input type="tel" id="phone" name="phone" class="w-full p-4 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent" placeholder="e.g., 9876543210" required>
+                    </div>
+                    <div>
+                        <label for="order-details" class="block text-xl font-semibold text-gray-700 mb-2">Your Order:</label>
+                        <textarea id="order-details" name="order-details" rows="6" class="w-full p-4 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent" placeholder="Add items to cart to see your order summary here!" readonly></textarea>
+                        <p class="text-sm text-gray-500 mt-2">Click "Add to Cart" on menu items to populate this field.</p>
+                    </div>
+                    <div class="mb-6">
+                        <label for="payment-method" class="block text-xl font-semibold text-gray-700 mb-2">Payment Method:</label>
+                        <select id="payment-method" name="paymentMethod" class="w-full p-4 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent" required>
+                            <option value="">Select Payment Method</option>
+                            <option value="COD">Cash on Delivery</option>
+                            <option value="GPay">UPI (Google Pay, PhonePe, etc.)</option>
+                            <option value="Card (Future Implementation)">Credit/Debit Card (Future Implementation)</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-center">
+                        <button type="submit" class="btn-primary text-white text-2xl font-bold py-4 px-12 rounded-full shadow-lg hover:shadow-xl transition transform focus:outline-none focus:ring-4 focus:ring-amber-300">
+                            Submit Order
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <section id="contact" class="p-12 rounded-3xl shadow-xl">
+            <h2 class="text-5xl font-extrabold text-center text-white mb-12 drop-shadow-md font-satisfy">
+                Get in Touch
+            </h2>
+
+            <div class="flex flex-col md:flex-row justify-around items-center text-center md:text-left gap-10">
+                <div class="bg-white/20 p-8 rounded-2xl shadow-md border border-white/30 w-full md:w-1/3 backdrop-blur-lg">
+                    <h3 class="text-3xl font-bold text-gray-100 mb-4">Location</h3>
+                    <p class="text-lg text-gray-200">Saravanampatti Road, Coimbatore</p>
+                </div>
+
+                <div class="bg-white/20 p-8 rounded-2xl shadow-md border border-white/30 w-full md:w-1/3 backdrop-blur-lg">
+                    <h3 class="text-3xl font-bold text-gray-100 mb-4">Call Us</h3>
+                    <p class="text-lg text-gray-200">+91 98765 43210</p>
+                </div>
+
+                <div class="bg-white/20 p-8 rounded-2xl shadow-md border border-white/30 w-full md:w-1/3 backdrop-blur-lg">
+                    <h3 class="text-3xl font-bold text-gray-100 mb-4">Email</h3>
+                    <p class="text-lg text-gray-200">teamdeliciousdish@gmail.com</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="bg-gray-800 text-white py-8 px-4 text-center mt-16 rounded-t-xl">
+        <div class="container mx-auto">
+            <p>&copy; 2025 DelishDish. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="orderConfirmationModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-button" id="closeModalBtn">&times;</span>
+            <h3 class="text-3xl font-bold text-center text-green-600 mb-6">Order Received!</h3>
+            <p class="text-lg text-center text-gray-700">Thank you for your order, <span id="modalCustomerName" class="font-semibold"></span>!</p>
+            <p class="text-lg text-center text-gray-700 mt-2">We've received your request for:</p>
+            <p id="modalOrderDetails" class="text-xl font-bold text-center text-gray-800 mt-4 break-words"></p>
+            <p id="modalOrderStatus" class="text-lg text-center text-blue-600 mt-4 font-semibold"></p>
+            <p class="text-lg text-center text-gray-700 mt-6">A confirmation email (with a 5-min cancel link) will be sent to <span id="modalCustomerEmail" class="font-semibold"></span> shortly.</p>
+            <p class="text-lg text-center text-gray-700 mt-2">Your food will be delivered to <span id="modalDeliveryAddress" class="font-semibold"></span>.</p>
+            <div class="flex justify-center mt-8">
+                <button id="okModalBtn" class="btn-secondary text-white px-8 py-3 rounded-full font-semibold text-lg shadow-md hover:shadow-lg">Got It!</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="authModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-button" id="closeAuthModalBtn">&times;</span>
+            <h3 class="text-3xl font-bold text-center text-orange-600 mb-6">Join or Login</h3>
+
+            <form id="signupForm" class="hidden">
+                <h4 class="text-xl font-bold mb-4">Sign Up</h4>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="signup-name">Name</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="signup-name" type="text" placeholder="Your Name" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="signup-email">Email</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="signup-email" type="email" placeholder="Your Email" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="signup-password">Password</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="signup-password" type="password" placeholder="********" required>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button class="btn-primary w-full text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                        Sign Up
+                    </button>
+                </div>
+                <p class="text-center text-gray-600 text-sm mt-4">Already have an account? <a href="#" id="showLogin" class="text-orange-500 font-bold hover:underline">Log in</a></p>
+            </form>
+
+            <form id="loginForm">
+                <h4 class="text-xl font-bold mb-4">Log In</h4>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="login-email">Email</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="login-email" type="email" placeholder="Your Email" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="login-password">Password</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="login-password" type="password" placeholder="********" required>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button class="btn-primary w-full text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                        Log In
+                    </button>
+                </div>
+                <p class="text-center text-gray-600 text-sm mt-4">
+                    <a href="#" id="showForgotPassword" class="text-orange-500 font-bold hover:underline">Forgot Password?</a>
+                </p>
+                <p class="text-center text-gray-600 text-sm mt-2">Don't have an account? <a href="#" id="showSignup" class="text-orange-500 font-bold hover:underline">Sign up</a></p>
+            </form>
+
+            <form id="forgotPasswordForm" class="hidden">
+                <h4 class="text-xl font-bold mb-4">Forgot Password</h4>
+                <p class="text-gray-600 text-sm mb-4">Enter your email address and we'll send you a link to reset your password.</p>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="forgot-email">Email</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="forgot-email" type="email" placeholder="Your Email" required>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button class="btn-primary w-full text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                        Send Reset Link
+                    </button>
+                </div>
+                <p class="text-center text-gray-600 text-sm mt-4">
+                    <a href="#" id="backToLogin" class="text-orange-500 font-bold hover:underline">Back to Login</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <div id="fitnessModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-button" id="closeFitnessModalBtn">&times;</span>
+            <h3 class="text-3xl font-bold text-center text-orange-600 mb-6">BMI Calculator & Food Suggestions</h3>
+
+            <form id="bmiForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="user-name">Your Name</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="user-name" type="text" placeholder="John Doe" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="user-age">Age</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="user-age" type="number" placeholder="e.g., 30" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="user-height">Height (in cm)</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="user-height" type="number" placeholder="e.g., 175" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="user-weight">Weight (in kg)</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="user-weight" type="number" placeholder="e.g., 70" required>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button class="btn-primary w-full text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                        Calculate BMI & Get Suggestions
+                    </button>
+                </div>
+            </form>
+
+            <div id="bmiResults" class="hidden mt-8 text-center">
+                <h4 class="text-2xl font-bold text-gray-800 mb-2">Results for <span id="resultsName"></span></h4>
+                <p class="text-xl">Your BMI: <span id="bmiValue" class="font-semibold text-orange-500"></span></p>
+                <p class="text-xl">Status: <span id="bmiStatus" class="font-semibold"></span></p>
+
+                <div class="mt-6 p-4 rounded-xl shadow-inner bg-gray-100">
+                    <h5 class="text-2xl font-bold text-green-600 mb-2">Weight Loss Diet Plan</h5>
+                    <p id="lossCalories" class="text-lg text-gray-700"></p>
+                    <div id="lossFoodsContainer" class="text-md text-gray-600 mt-2"></div>
+                </div>
+
+                <div class="mt-4 p-4 rounded-xl shadow-inner bg-gray-100">
+                    <h5 class="text-2xl font-bold text-red-600 mb-2">Weight Gain Diet Plan</h5>
+                    <p id="gainCalories" class="text-lg text-gray-700"></p>
+                    <div id="gainFoodsContainer" class="text-md text-gray-600 mt-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="foodDetailsModal" class="modal hidden">
+        <div class="modal-content max-w-lg">
+            <span class="close-button" id="closeFoodDetailsModalBtn">&times;</span>
+            <h3 id="detailFoodName" class="text-4xl font-extrabold text-center text-orange-600 mb-4 font-satisfy"></h3>
+
+            <div class="my-6 p-4 bg-gray-50 rounded-lg shadow-inner">
+                <h4 class="text-2xl font-bold text-gray-800 mb-2 border-b pb-1 border-orange-200">Ingredients</h4>
+                <ul id="detailIngredientsList" class="list-disc list-inside text-lg text-gray-700 ml-4 space-y-1"></ul>
+            </div>
+
+            <div class="p-4 bg-gray-50 rounded-lg shadow-inner">
+                <h4 class="text-2xl font-bold text-gray-800 mb-2 border-b pb-1 border-orange-200">Nutritional Information <span class="text-sm font-normal">(per serving)</span></h4>
+                <div class="space-y-2 text-lg text-gray-700 grid grid-cols-2 gap-y-2">
+                    <p>⚡ Calories: <span id="detailCalories" class="font-semibold text-orange-500"></span> kcal</p>
+                    <p>💪 Protein: <span id="detailProtein" class="font-semibold text-green-600"></span> g</p>
+                    <p>🍚 Carbs: <span id="detailCarbs" class="font-semibold"></span> g</p>
+                    <p>🧈 Fat: <span id="detailFat" class="font-semibold text-red-500"></span> g</p>
+                </div>
+            </div>
+
+            <div class="flex justify-center mt-8">
+                <button id="detailOrderBtn" class="btn-primary text-white text-xl font-bold py-3 px-8 rounded-full shadow-lg">
+                    Add to Cart
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- NEW: Simple JWT Decoder (Use a library like jwt-decode in production) ---
+        function jwt_decode(token) {
+            try {
+                // Decode the payload part of the token
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                console.error("Failed to decode JWT:", e);
+                return null; // Return null if decoding fails
+            }
+        }
+        // --- End New ---
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const backendBaseUrl = 'http://localhost:3000';
+            const orderForm = document.getElementById('orderForm');
+            const orderDetailsInput = document.getElementById('order-details');
+            const orderConfirmationModal = document.getElementById('orderConfirmationModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const okModalBtn = document.getElementById('okModalBtn');
+
+            const modalCustomerName = document.getElementById('modalCustomerName');
+            const modalCustomerEmail = document.getElementById('modalCustomerEmail');
+            const modalOrderDetails = document.getElementById('modalOrderDetails');
+            const modalDeliveryAddress = document.getElementById('modalDeliveryAddress');
+            const modalOrderStatus = document.getElementById('modalOrderStatus'); // NEW: Status element
+
+            const orderNowHeroBtn = document.getElementById('orderNowHeroBtn');
+            const menuItemsContainer = document.getElementById('menuItemsContainer');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const alertBox = document.getElementById('alertBox');
+            const alertMessage = document.getElementById('alertMessage');
+            const loginBtn = document.getElementById('loginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const authModal = document.getElementById('authModal');
+            const closeAuthModalBtn = document.getElementById('closeAuthModalBtn');
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const showLoginLink = document.getElementById('showLogin');
+            const showSignupLink = document.getElementById('showSignup');
+            const showForgotPassword = document.getElementById('showForgotPassword');
+            const backToLogin = document.getElementById('backToLogin');
+            const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+
+            const fitnessNavLink = document.getElementById('fitness-nav-link');
+            const fitnessModal = document.getElementById('fitnessModal');
+            const closeFitnessModalBtn = document.getElementById('closeFitnessModalBtn');
+            const bmiForm = document.getElementById('bmiForm');
+            const bmiResults = document.getElementById('bmiResults');
+            const resultsName = document.getElementById('resultsName');
+            const bmiValue = document.getElementById('bmiValue');
+            const bmiStatus = document.getElementById('bmiStatus');
+            const lossCalories = document.getElementById('lossCalories');
+            const lossFoodsContainer = document.getElementById('lossFoodsContainer');
+            const gainCalories = document.getElementById('gainCalories');
+            const gainFoodsContainer = document.getElementById('gainFoodsContainer');
+
+            const adminNavLink = document.getElementById('admin-login-link');
+            const adminLoginModal = document.getElementById('adminLoginModal');
+            const closeAdminLoginModal = document.getElementById('closeAdminLoginModal');
+            const adminLoginForm = document.getElementById('adminLoginForm');
+
+            const foodDetailsModal = document.getElementById('foodDetailsModal');
+            const closeFoodDetailsModalBtn = document.getElementById('closeFoodDetailsModalBtn');
+            const detailFoodName = document.getElementById('detailFoodName');
+            const detailIngredientsList = document.getElementById('detailIngredientsList');
+            const detailCalories = document.getElementById('detailCalories');
+            const detailProtein = document.getElementById('detailProtein');
+            const detailCarbs = document.getElementById('detailCarbs');
+            const detailFat = document.getElementById('detailFat');
+            let detailOrderBtn = document.getElementById('detailOrderBtn'); // Use let so it can be reassigned
+
+            let cart = [];
+            let allMenuItems = [];
+            let currentOrderId = null;
+
+            function showAlert(message, type = 'success', duration = 3000) {
+                alertMessage.textContent = message;
+                alertBox.className = 'alert-box'; // Reset classes
+                alertBox.classList.add('show', type); // Add show and type (success/error)
+
+                setTimeout(() => {
+                    alertBox.classList.remove('show');
+                }, duration);
+            }
+
+            // --- MODIFIED: openModal now fetches status ---
+            function openModal() {
+                orderConfirmationModal.classList.remove('hidden');
+                orderConfirmationModal.classList.add('flex');
+                // Fetch and display status when modal opens
+                if (currentOrderId) {
+                    fetchOrderStatus(currentOrderId);
+                } else {
+                     modalOrderStatus.textContent = 'Status: Unknown';
+                }
+            }
+
+            function closeModal() {
+                orderConfirmationModal.classList.add('hidden');
+                orderConfirmationModal.classList.remove('flex');
+                currentOrderId = null; // Reset order ID
+            }
+
+             // --- NEW: Function to Fetch and Display Order Status ---
+             async function fetchOrderStatus(orderId) {
+                const token = localStorage.getItem('token');
+                if (!orderId || !token || !modalOrderStatus) return;
+
+                modalOrderStatus.textContent = 'Loading status...';
+
+                try {
+                    // Use the dedicated tracking endpoint
+                    const response = await fetch(`${backendBaseUrl}/api/orders/track/${orderId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+
+                    if (response.ok) {
+                        const trackingInfo = await response.json();
+                        let statusText = `Status: ${trackingInfo.status || 'Unknown'}`;
+
+                        // Add timestamp details for clarity
+                        if (trackingInfo.deliveredAt) {
+                            statusText += ` (Delivered on ${new Date(trackingInfo.deliveredAt).toLocaleDateString()})`;
+                        } else if (trackingInfo.outForDeliveryAt) {
+                            statusText += ` (Out for Delivery since ${new Date(trackingInfo.outForDeliveryAt).toLocaleTimeString()})`;
+                        } else if (trackingInfo.acceptedAt) {
+                            statusText += ` (Accepted by partner at ${new Date(trackingInfo.acceptedAt).toLocaleTimeString()})`;
+                        } else if (trackingInfo.placedAt) {
+                            // Optionally show placed time if nothing else is available
+                        }
+                         modalOrderStatus.textContent = statusText;
+
+                    } else if (response.status === 404) {
+                         modalOrderStatus.textContent = 'Status: Order not found';
+                    } else if (response.status === 401 || response.status === 403){
+                         modalOrderStatus.textContent = 'Status: Authentication error';
+                         // Optionally prompt login again or handle differently
+                    }
+                    else {
+                         modalOrderStatus.textContent = 'Status: Could not fetch status';
+                    }
+                } catch (error) {
+                    console.error("Error fetching order status:", error);
+                    modalOrderStatus.textContent = 'Status: Network error';
+                }
+             }
+
+
+            function openDetailsModal(item) {
+                detailFoodName.textContent = item.name;
+                detailIngredientsList.innerHTML = '';
+                if (item.ingredients && Array.isArray(item.ingredients) && item.ingredients.length > 0) {
+                    item.ingredients.forEach(ing => {
+                        const li = document.createElement('li');
+                        li.textContent = ing;
+                        detailIngredientsList.appendChild(li);
+                    });
+                } else {
+                    detailIngredientsList.innerHTML = '<li>Ingredients not listed.</li>';
+                }
+                const nutrition = item.nutrition || {};
+                detailCalories.textContent = nutrition.calories ? `${nutrition.calories}` : 'N/A';
+                detailProtein.textContent = nutrition.protein_g ? `${parseFloat(nutrition.protein_g).toFixed(1)}` : 'N/A';
+                detailCarbs.textContent = nutrition.carbs_g ? `${parseFloat(nutrition.carbs_g).toFixed(1)}` : 'N/A';
+                detailFat.textContent = nutrition.fat_g ? `${parseFloat(nutrition.fat_g).toFixed(1)}` : 'N/A';
+
+                // Re-bind click listener to avoid duplicates
+                const newDetailOrderBtn = detailOrderBtn.cloneNode(true);
+                detailOrderBtn.parentNode.replaceChild(newDetailOrderBtn, detailOrderBtn); // Replace old with new
+                 // Assign the new button back to the global variable
+                detailOrderBtn = newDetailOrderBtn;
+                detailOrderBtn.addEventListener('click', () => {
+                    updateQuantity(item, 1);
+                    closeDetailsModal();
+                });
+
+                foodDetailsModal.classList.remove('hidden');
+                foodDetailsModal.classList.add('flex');
+            }
+
+            function closeDetailsModal() {
+                foodDetailsModal.classList.add('hidden');
+                foodDetailsModal.classList.remove('flex');
+            }
+
+            function openAuthModal() {
+                authModal.classList.remove('hidden');
+                authModal.classList.add('flex');
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+            }
+
+            function closeAuthModal() {
+                authModal.classList.add('hidden');
+                authModal.classList.remove('flex');
+            }
+
+            function openFitnessModal() {
+                fitnessModal.classList.remove('hidden');
+                fitnessModal.classList.add('flex');
+            }
+
+            function closeFitnessModal() {
+                fitnessModal.classList.add('hidden');
+                fitnessModal.classList.remove('flex');
+                bmiResults.classList.add('hidden'); // Reset BMI results
+            }
+
+            function openAdminLoginModal() {
+                adminLoginModal.classList.remove('hidden');
+                adminLoginModal.classList.add('flex');
+            }
+
+            function closeAdminLoginModalFunc() {
+                adminLoginModal.classList.add('hidden');
+                adminLoginModal.classList.remove('flex');
+                if(adminLoginForm) adminLoginForm.reset(); // Reset form on close
+            }
+
+            function checkUserStatus() {
+                const token = localStorage.getItem('token');
+                const userRole = localStorage.getItem('userRole');
+                if (token) {
+                    loginBtn.classList.add('hidden');
+                    logoutBtn.classList.remove('hidden');
+                    adminNavLink.href = (userRole === 'admin') ? 'admin.html' : '#';
+                     // Make Admin link non-clickable if not admin, but still visible
+                     if (userRole !== 'admin') {
+                         adminNavLink.style.pointerEvents = 'none';
+                         adminNavLink.style.opacity = '0.6';
+                     } else {
+                         adminNavLink.style.pointerEvents = 'auto';
+                         adminNavLink.style.opacity = '1';
+                     }
+                } else {
+                    loginBtn.classList.remove('hidden');
+                    logoutBtn.classList.add('hidden');
+                    adminNavLink.href = '#'; // Make Admin link open login modal if logged out
+                    adminNavLink.style.pointerEvents = 'auto'; // Re-enable click
+                    adminNavLink.style.opacity = '1';
+                }
+            }
+
+            // Event Listeners for Modals
+            closeModalBtn.addEventListener('click', closeModal);
+            okModalBtn.addEventListener('click', closeModal);
+            closeAuthModalBtn.addEventListener('click', closeAuthModal);
+            closeAdminLoginModal.addEventListener('click', closeAdminLoginModalFunc);
+            closeFoodDetailsModalBtn.addEventListener('click', closeDetailsModal);
+            closeFitnessModalBtn.addEventListener('click', closeFitnessModal);
+
+            loginBtn.addEventListener('click', openAuthModal);
+
+            adminNavLink.addEventListener('click', (e) => {
+                const userRole = localStorage.getItem('userRole');
+                const token = localStorage.getItem('token');
+                if (!token || userRole !== 'admin') {
+                    e.preventDefault(); // Prevent navigation
+                    openAdminLoginModal(); // Show login modal instead
+                }
+                // If token exists and role is admin, the default href="admin.html" works
+            });
+
+            showLoginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+            });
+            showSignupLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                signupForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+            });
+            showForgotPassword.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginForm.classList.add('hidden');
+                forgotPasswordForm.classList.remove('hidden');
+            });
+            backToLogin.addEventListener('click', (e) => {
+                e.preventDefault();
+                forgotPasswordForm.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+            });
+            logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userRole');
+                checkUserStatus();
+                showAlert('You have been logged out!', 'success');
+                 // Optionally clear cart on logout
+                 // cart = [];
+                 // updateOrderDetailsInput();
+            });
+
+            fitnessNavLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                openFitnessModal();
+            });
+
+
+            window.addEventListener('click', (event) => {
+                if (event.target == orderConfirmationModal) closeModal();
+                if (event.target == authModal) closeAuthModal();
+                if (event.target == fitnessModal) closeFitnessModal();
+                if (event.target == adminLoginModal) closeAdminLoginModalFunc();
+                if (event.target == foodDetailsModal) closeDetailsModal();
+            });
+
+            function updateQuantity(item, change) {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    showAlert('Please log in to add items to your cart.', 'error');
+                    openAuthModal();
+                    return;
+                }
+
+                // Ensure item has a valid price
+                 if (typeof item.price !== 'number' || isNaN(item.price)) {
+                     showAlert(`Cannot add ${item.name}, price is invalid.`, 'error');
+                     console.error("Invalid price for item:", item);
+                     return;
+                 }
+
+
+                const existingItemIndex = cart.findIndex(cartItem => cartItem.id === item.id);
+
+                if (existingItemIndex > -1) {
+                    const newQuantity = cart[existingItemIndex].quantity + change;
+                    if (newQuantity > 0) {
+                        cart[existingItemIndex].quantity = newQuantity;
+                        showAlert(`${item.name} quantity updated to ${newQuantity}!`);
+                    } else {
+                        cart.splice(existingItemIndex, 1);
+                        showAlert(`${item.name} removed from cart!`);
+                    }
+                } else if (change > 0) {
+                    // Add item with name and price for display in cart summary
+                    cart.push({ id: item.id, name: item.name, price: item.price, quantity: 1 });
+                    showAlert(`${item.name} added to cart!`);
+                } else {
+                    // showAlert('Item is not in the cart to decrease.', 'error'); // Can be noisy
+                }
+
+                updateOrderDetailsInput();
+                updateQuantityDisplay(item.id);
+            }
+
+            function updateQuantityDisplay(itemId) {
+                const quantityElement = document.getElementById(`quantity-${itemId}`);
+                if (quantityElement) {
+                    const cartItem = cart.find(item => item.id === itemId);
+                    quantityElement.textContent = cartItem ? cartItem.quantity : 0;
+                }
+            }
+
+            function renderMenuItems(items) {
+                menuItemsContainer.innerHTML = ''; // Clear previous items/loading message
+                if (!items || items.length === 0) {
+                    menuItemsContainer.innerHTML = '<p class="text-center text-white text-xl col-span-full">No menu items available right now. 🍜</p>'; // Updated message
+                    return;
+                }
+
+                items.forEach(item => {
+                     // Ensure price is a number before rendering
+                     const displayPrice = (typeof item.price === 'number' && !isNaN(item.price)) ? item.price.toFixed(2) : 'N/A';
+                     const currentQuantity = cart.find(cartItem => cartItem.id === item.id)?.quantity || 0;
+
+                    const menuItemCard = `
+                        <div class="card bg-white p-6 rounded-2xl shadow-lg flex flex-col items-center text-center border-b-4 border-amber-400">
+                            <img src="${item.image_url || 'https://placehold.co/400x300/cccccc/333333?text=No+Image'}" alt="${item.name}" class="w-full h-48 object-cover rounded-lg mb-4 shadow-md" onerror="this.onerror=null;this.src='https://placehold.co/400x300/cccccc/333333?text=Image+Error';">
+                            <h3 class="text-3xl font-bold text-gray-800 mb-2">${item.name}</h3>
+                            <p class="text-gray-600 text-lg mb-4 flex-grow">${item.description || 'No description available.'}</p> <span class="text-4xl font-extrabold text-green-600 mb-4">₹${displayPrice}</span>
+
+                            <button class="bg-blue-500 text-white font-bold py-2 px-6 rounded-full text-lg shadow-md hover:bg-blue-700 transition duration-300 mb-4 view-details-btn" data-item-id="${item.id}">
+                                View Details 💡
+                            </button>
+
+                            <div class="flex items-center justify-center mt-auto space-x-4"> <button class="bg-red-500 text-white font-bold py-2 px-4 rounded-full text-lg shadow-md hover:bg-red-700 transition duration-300 decrease-btn" data-item-id="${item.id}">-</button>
+                                <span class="text-2xl font-bold w-12 text-center" id="quantity-${item.id}">${currentQuantity}</span>
+                                <button class="bg-green-500 text-white font-bold py-2 px-4 rounded-full text-lg shadow-md hover:bg-green-700 transition duration-300 increase-btn" data-item-id="${item.id}">+</button>
+                            </div>
+                        </div>
+                    `;
+                    menuItemsContainer.insertAdjacentHTML('beforeend', menuItemCard);
+                });
+
+                // **NO LONGER NEEDED** after event delegation fix
+                // attachMenuButtonListeners();
+            }
+
+            // --- FIX: Event Delegation for Menu Items ---
+            // This single listener replaces the old attachMenuButtonListeners function
+            menuItemsContainer.addEventListener('click', (event) => {
+                // Find the closest button that was clicked
+                const button = event.target.closest('button');
+                if (!button) return; // Exit if the click wasn't on a button
+
+                // Get the item ID from the button's data-item-id attribute
+                const itemId = parseInt(button.dataset.itemId);
+                if (isNaN(itemId)) return; // Exit if the button has no item ID
+
+                // Find the corresponding item from our allMenuItems array
+                const item = allMenuItems.find(i => i.id === itemId);
+                if (!item) {
+                    console.error('Item not found for ID:', itemId);
+                    return; // Exit if no matching item
+                }
+
+                // Check which button was clicked based on its class
+                if (button.classList.contains('view-details-btn')) {
+                    openDetailsModal(item);
+                } else if (button.classList.contains('increase-btn')) {
+                    updateQuantity(item, 1);
+                } else if (button.classList.contains('decrease-btn')) {
+                    updateQuantity(item, -1);
+                }
+            });
+
+
+            // --- This function is no longer needed and has been removed ---
+            // function attachMenuButtonListeners() { ... }
+
+
+            async function fetchMenuItems() {
+                loadingMessage.textContent = 'Loading menu... 🍽️'; // Update loading message
+                loadingMessage.classList.remove('hidden'); // Ensure loading message is visible
+                menuItemsContainer.innerHTML = ''; // Clear container initially
+                try {
+                    const response = await fetch(`${backendBaseUrl}/api/menu_items`);
+                    if (!response.ok) {
+                         throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    allMenuItems = await response.json();
+                     // Filter out items with invalid prices before rendering
+                     const validMenuItems = allMenuItems.filter(item => typeof item.price === 'number' && !isNaN(item.price));
+                    renderMenuItems(validMenuItems);
+                    loadingMessage.classList.add('hidden'); // Hide loading message on success
+                } catch (error) {
+                    console.error('Could not fetch menu items:', error);
+                    loadingMessage.textContent = 'Failed to load menu. Please try again later. 😥';
+                    // Keep loading message visible on error
+                    showAlert('Could not load menu. Check connection.', 'error');
+                }
+            }
+
+            signupForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                 const name = document.getElementById('signup-name').value;
+                 const email = document.getElementById('signup-email').value;
+                 const password = document.getElementById('signup-password').value;
+                 if(password.length < 6) {
+                     showAlert("Password must be at least 6 characters.", "error");
+                     return;
+                 }
+
+                 try {
+                     const response = await fetch(`${backendBaseUrl}/api/signup`, {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({ name, email, password })
+                     });
+                     if (response.ok) {
+                         showAlert("Signup successful! Please log in.");
+                         signupForm.reset();
+                         loginForm.classList.remove('hidden');
+                         signupForm.classList.add('hidden');
+                     } else {
+                        const data = await response.json();
+                         showAlert(`Signup failed: ${data.message || 'Email might already exist.'}`, "error");
+                     }
+                 } catch (error) {
+                      showAlert("Signup failed due to network error.", "error");
+                 }
+            });
+
+            loginForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+
+                try {
+                    const response = await fetch(`${backendBaseUrl}/api/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('userRole', data.role);
+                        closeAuthModal();
+                        checkUserStatus();
+                        showAlert("Login successful!");
+                    } else {
+                        const data = await response.json();
+                        showAlert(`Login failed: ${data.message || 'Invalid credentials.'}`, "error");
+                    }
+                } catch (error) {
+                     showAlert("Login failed due to network error.", "error");
+                }
+            });
+
+            adminLoginForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const email = document.getElementById('admin-email').value;
+                const password = document.getElementById('admin-password').value;
+
+                try {
+                    const response = await fetch(`${backendBaseUrl}/api/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    const data = await response.json();
+
+                    if (response.ok && data.role === 'admin') {
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('userRole', data.role);
+                        closeAdminLoginModalFunc();
+                        checkUserStatus(); // Update nav bar
+                        showAlert("Admin login successful!", 'success');
+                        window.location.href = 'admin.html'; // Redirect to admin page
+                    } else if (response.ok && data.role !== 'admin') {
+                         showAlert("Login successful, but you are not an admin.", "error");
+                    }
+                    else {
+                         showAlert(`Admin login failed: ${data.message || 'Invalid credentials.'}`, "error");
+                    }
+                } catch (error) {
+                    console.error('Admin login network error:', error);
+                    showAlert('Network error during admin login.', 'error');
+                }
+            });
+
+
+            orderForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    showAlert('Please log in to place an order.', 'error');
+                    openAuthModal();
+                    return;
+                }
+
+                const customerName = document.getElementById('name').value;
+                const customerEmail = document.getElementById('email').value;
+                const deliveryAddress = document.getElementById('address').value;
+                const customerPhone = document.getElementById('phone').value;
+                // orderDetails is derived from cart, not read from textarea
+                const paymentMethod = document.getElementById('payment-method').value;
+
+                if (cart.length === 0) {
+                    showAlert('Your cart is empty!', 'error'); return;
+                }
+                if (!paymentMethod) {
+                    showAlert('Please select a payment method.', 'error'); return;
+                }
+                if (paymentMethod.includes('Future Implementation')) {
+                    showAlert('Card payment is not yet available.', 'error'); return;
+                }
+                 // Basic phone validation (example: 10 digits)
+                 if (!/^\d{10}$/.test(customerPhone)) {
+                     showAlert('Please enter a valid 10-digit phone number.', 'error'); return;
+                 }
+
+
+                // Prepare cart data - ensure name/price are included if needed by backend email logic
+                const cartDataForBackend = cart.map(item => ({
+                    id: item.id,
+                    name: item.name, // Include name for email confirmation
+                    quantity: item.quantity,
+                    price: item.price // Price at the time of adding to cart
+                }));
+
+                const orderData = {
+                    customerName, customerEmail, customerPhone, deliveryAddress,
+                    cartItems: cartDataForBackend, // Send the prepared cart data
+                    paymentMethod
+                };
+
+                 // Disable submit button during submission
+                 const submitButton = orderForm.querySelector('button[type="submit"]');
+                 submitButton.disabled = true;
+                 submitButton.textContent = 'Submitting...';
+
+
+                try {
+                    const response = await fetch(`${backendBaseUrl}/api/orders`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(orderData),
+                    });
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        currentOrderId = result.orderId;
+                        modalCustomerName.textContent = customerName;
+                        modalCustomerEmail.textContent = customerEmail;
+                        // Regenerate order details string for the modal based on submitted cart
+                        const modalOrderSummary = cart.map(item => `${item.quantity}x ${item.name} (₹${(item.price * item.quantity).toFixed(2)})`).join('\n');
+                        const modalTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+                        modalOrderDetails.textContent = `${modalOrderSummary}\n\nTotal: ₹${modalTotal.toFixed(2)}`;
+                        modalDeliveryAddress.textContent = deliveryAddress;
+
+                        openModal(); // This will now also fetch status
+                        showAlert('Order placed successfully!', 'success');
+
+                        orderForm.reset();
+                        cart = [];
+                        updateOrderDetailsInput();
+                        // Reset all quantity displays on menu
+                        document.querySelectorAll('[id^="quantity-"]').forEach(el => el.textContent = '0');
+
+                    } else {
+                        showAlert(`Failed to place order: ${result.message || 'Check details.'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Network error submitting order:', error);
+                    showAlert('Network error placing order. Please try again.', 'error');
+                } finally {
+                    // Re-enable submit button
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Submit Order';
+                }
+            });
+
+
+            bmiForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const name = document.getElementById('user-name').value;
+                const age = document.getElementById('user-age').value;
+                const height = document.getElementById('user-height').value;
+                const weight = document.getElementById('user-weight').value;
+
+                 // Basic validation
+                 if (!name || !age || !height || !weight || age <= 0 || height <= 0 || weight <= 0) {
+                     showAlert('Please enter valid details (age, height, weight must be positive numbers).', 'error');
+                     return;
+                 }
+
+
+                try {
+                    const response = await fetch(`${backendBaseUrl}/api/fitness`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, age: parseInt(age), height: parseFloat(height), weight: parseFloat(weight) }),
+                    });
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        resultsName.textContent = result.name;
+                        bmiValue.textContent = result.bmi.toFixed(2);
+                        bmiStatus.textContent = result.status;
+                        lossCalories.textContent = `Target Daily Calories: ~${result.weightLoss.calories} kcal`;
+                        gainCalories.textContent = `Target Daily Calories: ~${result.weightGain.calories} kcal`;
+                        renderFoodSuggestions(result.weightLoss.foods, lossFoodsContainer);
+                        renderFoodSuggestions(result.weightGain.foods, gainFoodsContainer);
+                        bmiResults.classList.remove('hidden');
+                        showAlert('BMI calculation successful!', 'success');
+                    } else {
+                        showAlert(`BMI Calculation failed: ${result.message || 'Invalid input.'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error fetching BMI data:', error);
+                    showAlert('Network error calculating BMI.', 'error');
+                }
+            });
+
+            function renderFoodSuggestions(foods, container) {
+                container.innerHTML = '';
+                if (!foods || foods.length === 0) {
+                    container.textContent = 'No specific suggestions available from our menu.';
+                    return;
+                }
+                foods.forEach(food => {
+                     // Find the full item details from allMenuItems to ensure price is correct
+                     const menuItem = allMenuItems.find(item => item.id === food.id);
+                     if (!menuItem) return; // Skip if item not found in current menu
+
+                    const foodElement = document.createElement('div');
+                    foodElement.className = 'flex items-center justify-between p-2 my-1 bg-white rounded shadow-sm';
+                    foodElement.innerHTML = `
+                        <p class="font-semibold text-gray-800 text-sm">${menuItem.name}</p>
+                        <button class="btn-primary text-white font-bold py-1 px-3 rounded-full text-xs add-to-cart-suggestion">Order</button>
+                    `;
+                    foodElement.querySelector('.add-to-cart-suggestion').addEventListener('click', () => {
+                         updateQuantity(menuItem, 1); // Use the full menuItem with correct price
+                         showAlert(`${menuItem.name} added from suggestions!`);
+                         closeFitnessModal(); // Optionally close modal after adding
+                    });
+                    container.appendChild(foodElement);
+                });
+            }
+
+            // Smooth scrolling for nav links
+            document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+
+            // Hero button scroll
+            orderNowHeroBtn.addEventListener('click', () => {
+                 const menuSection = document.getElementById('menu');
+                 if(menuSection) menuSection.scrollIntoView({ behavior: 'smooth' });
+            });
+
+            function updateOrderDetailsInput() {
+                if (cart.length === 0) {
+                    orderDetailsInput.value = 'Your cart is empty. Add some items!';
+                    orderDetailsInput.placeholder = 'Add items to cart to see your order summary here!';
+                    // Reset quantities on cards visually
+                    document.querySelectorAll('[id^="quantity-"]').forEach(el => el.textContent = '0');
+                    return;
+                }
+
+                let orderSummary = '';
+                let totalCartPrice = 0;
+
+                cart.forEach(item => {
+                     const itemTotal = (item.price * item.quantity);
+                     orderSummary += `${item.quantity}x ${item.name} (@ ₹${item.price.toFixed(2)}) = ₹${itemTotal.toFixed(2)}\n`;
+                     totalCartPrice += itemTotal;
+                });
+
+                orderSummary += `\nTotal: ₹${totalCartPrice.toFixed(2)}`;
+                orderDetailsInput.value = orderSummary.trim();
+            }
+
+            // --- Initial Setup ---
+            fetchMenuItems();
+            checkUserStatus();
+            updateOrderDetailsInput(); // Initialize cart display
+
+        });
+    </script>
+</body>
+</html>

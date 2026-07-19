@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+web/node_modules/
+
+# Environment variables (contains secrets)
+.env
+web/.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build artifacts
+dist/
+build/
+
+# Lock files in subdirectories (keep root and web/ lockfiles)
+web/public/package-lock.json
