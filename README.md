@@ -282,16 +282,6 @@ http://localhost:3000/delivery.html → Delivery Portal
 
 ---
 
-## 👤 Default Admin Account
-
-| Field | Value |
-|-------|-------|
-| Email | `arunkumar30102006@gmail.com` |
-| Password | `Ak@30102006` |
-
-> ⚠️ **Change the default admin password in production!**
-
----
 
 ## ✨ Key Features
 
