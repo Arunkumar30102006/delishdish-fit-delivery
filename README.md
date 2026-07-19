@@ -361,5 +361,5 @@ ISC
 ---
 
 <p align="center">
-  Built with ❤️ by <strong>Arun Kumar</strong>
+  Built by <strong>Arun Kumar</strong>
 </p>
